@@ -6,17 +6,24 @@ var FONTTYPE = {
 class Kage {
   constructor(type, size){
     this.kBuhin = new Buhin();
+    this.setFont(type,size);
+    this.kRate = 100;
+  }
+  setFont(type, size){
     switch(type){
+     case FONTTYPE.GOTHIC:{
+        this.kFont = new Gothic(size);
+        break;
+      }
       case FONTTYPE.MINCHO:{
         this.kFont = new Mincho(size);
         break;
       }
-      case FONTTYPE.GOTHIC:{
-        this.kFont = new Gothic(size);
+      default:{
+        this.kFont = new Mincho(size);
         break;
       }
     }
-    this.kRate = 100;
   }
   // methods
   makeGlyph(polygons, buhin) { // The word "buhin" means "component".  This method converts buhin (KAGE data format) to polygons (path data).  The variable buhin may represent a component of kanji or a kanji itself.
