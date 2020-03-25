@@ -46,6 +46,13 @@ function Polygons(){
     }
   }
   Polygons.prototype.push = push;
+  function concat(polygons){
+    for(let polygon of polygons.array){
+      this.push(polygon);
+      
+    }
+  }
+  Polygons.prototype.concat = concat;
   
   function generateSVG(curve){ // string
     var buffer = "";
