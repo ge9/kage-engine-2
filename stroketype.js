@@ -19,7 +19,7 @@ var STARTTYPE = {
 }
 var ENDTYPE = {
     OPEN : 0,//simple lines like "三" or "川" (two strokes on the right side)
-             //also used in the right stroke of "人"
+             //also used in the right stroke of "人"(L2R sweep)
     CONNECTING_H : 2,
     CONNECTING_V : 32,///vertical strokes connecting to other strokes.  used in the center strokes of "工".
     LOWER_LEFT_CORNER : 13,
