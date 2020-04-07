@@ -8,6 +8,9 @@ class FontCanvas {
   addPolygon(poly) {
     this.polygons.push(poly);
   }
+
+  //flipping and rotating
+  //polygons in the rectangle (x1, y1, x2, y2) are flipped or rotated
   flip_left_right(x1, y1, x2, y2) {
     for (var i = 0; i < this.polygons.array.length; i++) {
       var inside = true;
@@ -329,6 +332,89 @@ class FontCanvas {
     poly.push(x2 + kMinWidthT, y2 + kagekMinWidthY);
     this.polygons.push(poly);
   }
+  
+  drawTailCircle_tan(tailX, tailY, srcX, srcY, r, tan1, tan2) {
+    //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
+    var poly = new Polygon();
+    const vec1 = vector_to_len(tan1, r*bez_cir*0.82);
+    const vec2 = vector_to_len(tan2, r*bez_cir*0.84);
+    if (srcX == tailX) {//vertical
+      if (tailY > srcY) {//down
+        poly.push(tailX + r            , tailY);
+        poly.push(tailX + r + vec1[0], tailY + vec1[1], 2);
+        poly.push(tailX + bez_cir*r    , tailY + r*1.02, 2);
+        poly.push(tailX                , tailY + r*1.02);
+        poly.push(tailX - bez_cir*r    , tailY + r*1.02, 2);
+        poly.push(tailX - r + vec2[0], tailY + vec2[1], 2);
+        poly.push(tailX - r            , tailY);
+      } else {
+        poly.push(tailX - r            , tailY);
+        poly.push(tailX - r + vec1[0], tailY + vec1[1], 2);
+        poly.push(tailX - bez_cir*r    , tailY - r*1.02, 2);
+        poly.push(tailX                , tailY - r*1.02);
+        poly.push(tailX + bez_cir*r    , tailY - r*1.02, 2);
+        poly.push(tailX + r + vec2[0], tailY + vec2[1], 2);
+        poly.push(tailX + r            , tailY);
+      }
+    } else if (srcY == tailY) {//horizontal
+      if (tailX > srcX) {//right
+        poly.push(tailX            , tailY - r);
+        poly.push(tailX + vec1[0], tailY - r + vec1[1], 2);
+        poly.push(tailX + r*1.02    , tailY - bez_cir*r, 2);
+        poly.push(tailX + r*1.02    , tailY);
+        poly.push(tailX + r*1.02    , tailY + bez_cir*r, 2);
+        poly.push(tailX + vec2[0], tailY + r + vec2[1], 2);
+        poly.push(tailX            , tailY + r);
+      } else {
+        poly.push(tailX            , tailY + r);
+        poly.push(tailX + vec1[0], tailY + r + vec1[1], 2);
+        poly.push(tailX - r*1.02    , tailY + bez_cir*r, 2);
+        poly.push(tailX - r*1.02    , tailY);
+        poly.push(tailX - r*1.02    , tailY - bez_cir*r, 2);
+        poly.push(tailX + vec2[0], tailY - r + vec2[1], 2);
+        poly.push(tailX            , tailY - r);
+      }
+    }else{
+      var rad = Math.atan((tailY - srcY) / (tailX - srcX));
+      const v =  (srcX < tailX) ? 1 : -1;
+      poly.push(tailX + v*Math.sin(rad) * r            , tailY - v*Math.cos(rad) * r);
+      poly.push(tailX + v*Math.sin(rad) * r + vec1[0], tailY - v*Math.cos(rad) * r + vec1[1], 2);
+      poly.push(tailX + v*Math.cos(rad) * r*1.02 + v*Math.sin(rad) * bez_cir*r,
+                tailY + v*Math.sin(rad) * r*1.02 - v*Math.cos(rad) * bez_cir*r, 2);
+      poly.push(tailX + v*Math.cos(rad) * r*1.02,
+                tailY + v*Math.sin(rad) * r*1.02);
+      poly.push(tailX + v*Math.cos(rad) * r*1.02 - v*Math.sin(rad) * bez_cir*r,
+                tailY + v*Math.sin(rad) * r*1.02 + v*Math.cos(rad) * bez_cir*r, 2);
+      poly.push(tailX - v*Math.sin(rad) * r + vec2[0], tailY + v*Math.cos(rad) * r + vec2[1], 2);
+      poly.push(tailX - v*Math.sin(rad) * r            , tailY + v*Math.cos(rad) * r);      
+    }
+    this.polygons.push(poly);
+  }
+
+  drawTailCircle_slant(tailX, tailY, srcX, srcY, src2X, src2Y, r, tan1, tan2) {
+    const vx = tailX-srcX;
+    const vy = tailY-srcY;
+    const vx2 = tailX-src2X;
+    const vy2 = tailY-src2Y;
+    const vec1 = vector_to_len(tan1, r*bez_cir*0.98);
+    const vec2 = vector_to_len(tan2, r*bez_cir*0.98);
+    
+    let [ia, ib] = unit_normal_vector(vx2, vy2);
+    var poly = new Polygon();
+    const slanted_vec = tan1;
+    const slant_cos = (vx*vx2+vy*vy2)/(Math.sqrt(vx*vx+vy*vy)*Math.sqrt(vx2*vx2+vy2*vy2));
+    const center = vector_to_len(slanted_vec, r/slant_cos);
+    console.log(center, slant_cos);
+    poly.push(tailX - ia*r, tailY - ib*r);
+    poly.push(tailX - ia*r + vec1[0], tailY - ib*r + vec1[1], 2);
+    poly.push(tailX + center[0] - ia*r*bez_cir, tailY + center[1] - ib*r*bez_cir, 2);
+    poly.push(tailX + center[0], tailY + center[1]);
+    poly.push(tailX + center[0] + ia*r*bez_cir, tailY + center[1] + ib*r*bez_cir, 2);
+    poly.push(tailX + ia*r + vec2[0], tailY + ib*r + vec2[1], 2);
+    poly.push(tailX + ia*r, tailY + ib*r);
+
+    this.polygons.push(poly);
+  }
 
   drawTailCircle_wrong(tailX, tailY, srcX, srcY, r) {
     //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
@@ -346,7 +432,7 @@ class FontCanvas {
     }
   }
 
-  drawTailCircle_right(tailX, tailY, srcX, srcY, r) {
+  drawTailCircle(tailX, tailY, srcX, srcY, r) {
     //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
     var rad;
     var v;
@@ -380,7 +466,7 @@ class FontCanvas {
     }
   }
 
-  drawTailCircle_right_c(tailX, tailY, srcX, srcY, r) {
+  drawTailCircle_c(tailX, tailY, srcX, srcY, r) {
     //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
     var rad;
     var v;
@@ -481,7 +567,7 @@ class FontCanvas {
     poly.push(x2 - Math.sin(rad) * kMinWidthT2 * v, y2 + Math.cos(rad) * kMinWidthT2 * v);
     this.polygons.push(poly);
   }
-  drawKAGICircle_rad(x2, y2, rad, v, kMinWidthT) {
+  drawKAGICircle_rad(x2, y2, rad, v, kMinWidthT) {//0.8 -> 0.6?
     var poly = new Polygon();
     poly.push(x2 + Math.sin(rad) * kMinWidthT * v, y2 - Math.cos(rad) * kMinWidthT * v);
     poly.push(x2 + Math.cos(rad) * kMinWidthT * 0.8 * v + Math.sin(rad) * kMinWidthT * 0.6 * v,
@@ -616,9 +702,9 @@ class FontCanvas {
     var poly = new Polygon();
     poly.push(x2 + Math.sin(rad) * kagekMinWidthY, y2 - Math.cos(rad) * kagekMinWidthY);
     poly.push(x2 - Math.cos(rad) * urokoX, y2 - Math.sin(rad) * urokoX);
-    poly.push(x2 - Math.cos(rad) * urokoX / 2 + Math.sin(rad) * urokoX / 2, y2 - Math.sin(rad) * urokoY - Math.cos(rad) * urokoY);
+    //poly.push(x2 - Math.cos(rad) * urokoX / 2 + Math.sin(rad) * urokoX / 2, y2 - Math.sin(rad) * urokoY - Math.cos(rad) * urokoY);
     //should be fixed as following:
-    //poly.push(x2 - Math.cos(rad) * urokoX / 2 + Math.sin(rad) * urokoY, y2 - Math.sin(rad) * urokoX / 2 - Math.cos(rad) * urokoY);
+    poly.push(x2 - Math.cos(rad) * urokoX / 2 + Math.sin(rad) * urokoY, y2 - Math.sin(rad) * urokoX / 2 - Math.cos(rad) * urokoY);
     this.polygons.push(poly);
   }
 
@@ -734,53 +820,16 @@ class FontCanvas {
     this.polygons.push(poly);
   }
 
-  drawCBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, curve_step) {
-    var poly = new Polygon();
-    var poly2 = new Polygon();
-    for (var tt = 0; tt <= curve_step; tt++) {
-      const t = tt / curve_step;
-      // calculate a dot
-      const x = (1.0 - t) * (1.0 - t) * (1.0 - t) * x1 + 3.0 * t * (1.0 - t) * (1.0 - t) * sx1 + 3 * t * t * (1.0 - t) * sx2 + t * t * t * x2;
-      const y = (1.0 - t) * (1.0 - t) * (1.0 - t) * y1 + 3.0 * t * (1.0 - t) * (1.0 - t) * sy1 + 3 * t * t * (1.0 - t) * sy2 + t * t * t * y2;
-      // KATAMUKI of vector by BIBUN
-      const ix = t * t * (-3 * x1 + 9 * sx1 + -9 * sx2 + 3 * x2) + t * (6 * x1 + -12 * sx1 + 6 * sx2) + -3 * x1 + 3 * sx1;
-      const iy = t * t * (-3 * y1 + 9 * sy1 + -9 * sy2 + 3 * y2) + t * (6 * y1 + -12 * sy1 + 6 * sy2) + -3 * y1 + 3 * sy1;
-
-      let [ia, ib] = get_unit_normal_vector(ix, iy);
-      const deltad = width_func(t);
-      ia = ia * deltad;
-      ib = ib * deltad;
-      //copy to polygon structure
-      poly.push(x - ia, y - ib);
-      poly2.push(x + ia, y + ib);
-    }
-    poly2.reverse();
-    poly.concat(poly2);
+  drawCBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d, curve_step) {
+    let [bez1, bez2] = Bezier.cBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d, curve_step);
+    var poly = Bezier.bez_to_poly(bez1);
+    poly.concat(Bezier.bez_to_poly(bez2));
     this.polygons.push(poly);
   }
-
-  drawQBezier(x1, y1, sx, sy, x2, y2, width_func, curve_step) {
-    var poly = new Polygon();
-    var poly2 = new Polygon();
-    for (var tt = 0; tt <= curve_step; tt++) {
-      const t = tt / curve_step;
-      // calculate a dot
-      const x = ((1.0 - t) * (1.0 - t) * x1 + 2.0 * t * (1.0 - t) * sx + t * t * x2);
-      const y = ((1.0 - t) * (1.0 - t) * y1 + 2.0 * t * (1.0 - t) * sy + t * t * y2);
-      // KATAMUKI of vector by BIBUN
-      const ix = (x1 - 2.0 * sx + x2) * 2.0 * t + (-2.0 * x1 + 2.0 * sx);
-      const iy = (y1 - 2.0 * sy + y2) * 2.0 * t + (-2.0 * y1 + 2.0 * sy);
-
-      let [ia, ib] = get_unit_normal_vector(ix, iy);
-      const deltad = width_func(t);
-      ia = ia * deltad;
-      ib = ib * deltad;
-      //copy to polygon structure
-      poly.push(x - ia, y - ib);
-      poly2.push(x + ia, y + ib);
-    }
-    poly2.reverse();
-    poly.concat(poly2);
+  drawQBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step) {
+    let [bez1, bez2] = Bezier.qBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step);
+    var poly = Bezier.bez_to_poly(bez1);
+    poly.concat(Bezier.bez_to_poly(bez2));
     this.polygons.push(poly);
   }
 }

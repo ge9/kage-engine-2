@@ -61,7 +61,9 @@ class Polygons{
         for(var j = 1; j < this.array[i].array.length; j++){
           if(this.array[i].array[j].off == 1){
             buffer += "Q ";
-          } else if(this.array[i].array[j - 1].off != 1){
+          } else if(this.array[i].array[j].off == 2 && this.array[i].array[j - 1].off == 0){
+            buffer += "C ";
+          } else if(this.array[i].array[j].off == 0 && this.array[i].array[j - 1].off == 0){
             buffer += "L ";
           }
           buffer += this.array[i].array[j].x + "," + this.array[i].array[j].y + " ";

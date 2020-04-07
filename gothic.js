@@ -1,6 +1,6 @@
 class Gothic{
   constructor(size) {
-    this.kRate = 100;
+    this.kRate = 50;
     if (size == 1) {
       this.kWidth = 3;
       this.kKakato = 1.8;
@@ -91,11 +91,11 @@ class Gothic{
         const ty1 = y4;
         const tx2 = x4 + this.kMage * 0.5;
         const ty2 = y4 - this.kMage * 2;
-        cv.drawCBezier(x1, y1, x2, y2, x3, y3, tx1, ty1, (t) => { return this.kWidth; }, 1000 / this.kRate);
+        cv.drawCBezier(x1, y1, x2, y2, x3, y3, tx1, ty1, (t) => { return this.kWidth; }, t => 0, 1000 / this.kRate);
         this.gothicDrawCurve(tx1, ty1, x4, y4, tx2, ty2, a1, a2, cv);
       }
       else{
-        cv.drawCBezier(x1, y1, x2, y2, x3, y3, x4, y4,  (t) => { return this.kWidth; }, 1000 / this.kRate);
+        cv.drawCBezier(x1, y1, x2, y2, x3, y3, x4, y4,  (t) => { return this.kWidth; }, t => 0, 1000 / this.kRate);
       }
       break;
     case 7:
@@ -127,7 +127,7 @@ class Gothic{
       let [x2ext, y2ext] = get_extended_dest_wrong(x3, y3, sx2, sy2, this.kWidth * this.kKakato);
       x3 = x2ext; y3 = y2ext;
     }
-    cv.drawQBezier(x1, y1, x2, y2, x3, y3, (t) => { return this.kWidth; }, 1000 / this.kRate);
+    cv.drawQBezier(x1, y1, x2, y2, x3, y3, (t) => { return this.kWidth; }, t => 0, 1000 / this.kRate);
   }
 
   gothicDrawLine(tx1, ty1, tx2, ty2, ta1, ta2, cv) {

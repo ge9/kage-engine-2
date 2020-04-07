@@ -12,12 +12,14 @@
   <script type="text/javascript" src="polygon.js"></script>
   <script type="text/javascript" src="polygons.js"></script>
   <script type="text/javascript" src="stroketype.js"></script>
+  <script type="text/javascript" src="fit-curve.js"></script>
+  <script type="text/javascript" src="bezier.js"></script>
   <script type="text/javascript">
 function draw() {
  var canvas = document.getElementById("canvas");
  var ctx = canvas.getContext("2d");
  var kage = new Kage(FONTTYPE.MINCHO);
- kage.kFont.kUseCurve = false;
+ kage.kFont.kUseCurve = true;
  function getSVG(data){
   var polygons = new Polygons();
   kage.makeGlyph(polygons, data);
@@ -40,6 +42,8 @@ function draw() {
  kage.kBuhin.push("testdata25","1:0:4:117:59:133:140$1:0:4:167:33:167:116$1:0:4:82:147:74:102$1:0:4:65:76:65:28$1:0:4:79:41:137:19$1:0:4:81:188:139:188$1:0:4:128:31:184:22");
  kage.kBuhin.push("testdata16","1:0:0:27:37:173:37$1:32:24:118:37:53:74$1:0:0:14:165:186:165$1:32:24:89:89:158:118$1:32:24:151:48:151:93$1:32:24:17:17:44:109$1:32:24:23:100:40:55");
  kage.kBuhin.push("testdata17","2:22:8:166:85:129:109:129:69$2:22:8:92:37:48:60:55:21$2:22:8:73:15:119:61:136:32$2:32:8:70:96:33:120:33:80$1:0:0:47:96:104:96$2:32:4:114:111:77:135:130:167$1:0:0:91:111:148:111$2:32:5:48:123:68:141:77:175$1:0:0:25:123:82:123$2:22:5:157:131:191:156:165:154$2:32:7:130:15:58:18:152:69$1:0:0:107:15:164:15$6:22:5:139:155:182:168:101:182:195:195$6:22:5:50:57:15:74:15:25:78:88$6:22:5:186:20:147:36:149:60:177:73$2:32:8:36:137:4:163:35:174$2:7:8:84:149:107:172:95:187$6:7:8:103:58:88:76:122:86:114:96$6:22:8:33:18:3:30:33:40:25:50$6:22:8:183:89:198:104:180:110:172:120$2:32:8:90:133:50:149:79:164$2:32:8:101:133:121:151:130:185$1:0:0:78:133:135:133");
+ kage.kBuhin.push("testdata18","2:7:0:7:6:27:83:79:42$2:7:0:35:13:55:90:113:72$2:0:7:48:72:68:149:5:141$2:7:0:124:32:146:106:83:98$6:7:0:131:87:146:137:103:119:90:153$6:7:0:190:80:138:89:162:112:163:140$6:7:0:183:21:131:30:155:53:155:74$6:7:0:150:138:97:149:63:189:129:185$6:7:4:86:132:46:116:35:161:65:179$6:0:7:149:12:107:6:98:41:128:59$6:22:7:194:150:147:163:143:179:173:197$6:7:8:47:64:16:67:2:92:26:111$2:7:8:184:35:192:61:174:68");
+ kage.kBuhin.push("testc","2:7:8:90:126:121:126:144:126$2:7:8:113:90:155:90:167:90$2:7:8:120:65:139:65:174:65$2:7:8:21:35:38:44:63:57$2:7:8:35:81:63:95:77:103");
  
  kage.kBuhin.push("u5315", "2:0:7:154:64:101:91:45:102$3:0:5:45:25:45:176:158:176");
  kage.kBuhin.push("u20915-08", "99:0:0:54:6:154:84:u5315:0:0:0$2:0:7:81:84:76:109:60:128$1:0:0:76:104:137:104$1:0:0:57:136:140:136$2:32:7:102:104:101:173:45:188$2:7:8:97:145:122:157:128:171");
@@ -53,25 +57,35 @@ function draw() {
  kage.kBuhin.push("u3cc4-03-var-001", "99:0:0:0:-36:198:164:u6c35-01-var-001:0:0:0$2:0:7:104:14:93:47:66:69$1:0:2:91:38:168:38$2:22:7:168:38:165:44:145:64$2:32:7:122:38:116:98:63:113$2:7:0:123:38:128:94:173:109");
  kage.kBuhin.push("u6c35-01-var-001", "2:7:8:31:53:50:61:55:71$2:7:8:13:76:32:84:37:95$2:7:8:16:120:46:123:43:151$2:32:7:39:128:44:120:82:60");
  kage.kBuhin.push("u7f8a-03", "2:7:8:55:13:71:24:78:41$2:0:7:141:15:132:30:117:47$1:0:0:22:47:178:47$1:32:32:100:47:100:101$1:0:0:30:74:170:74$1:0:0:15:101:185:101");
+
+ kage.kBuhin.push("u8108-j", "99:0:0:2:0:153:200:u6708-01$99:0:0:8:0:200:200:u200a2-02");
+ kage.kBuhin.push("u6708-01", "7:12:7:33:24:33:118:33:173:13:188$1:2:2:33:24:83:24$1:22:4:83:24:83:181$1:2:2:33:67:83:67$1:2:2:33:112:83:112");
+ kage.kBuhin.push("u200a2-02", "2:0:7:163:19:135:35:91:44$7:12:7:91:44:91:98:91:158:75:182$2:0:7:176:51:140:70:94:78$1:0:0:120:76:120:186$2:0:7:181:88:169:95:149:103$2:7:0:141:69:150:151:181:177");
  
  var polygons = new Polygons();
- kage.makeGlyph(polygons, "u51dd");
+ kage.makeGlyph(polygons, "u7fa8");
  document.getElementById('svg').innerHTML = polygons.generateSVG(kage.kFont.kUseCurve);
  document.getElementById('eps').innerHTML = polygons.generateEPS(kage.kFont.kUseCurve);
 
- let element = document.getElementById('box');
- element.insertAdjacentHTML('beforebegin', getSVG("testdata1"));
+ let element = document.getElementById('canvas');
+ element.insertAdjacentHTML('beforebegin', getSVG("va"));
+ 
+ element.insertAdjacentHTML('beforebegin', getSVG("testdata18"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata2"));
- element.insertAdjacentHTML('beforebegin', getSVG("testdata3"));
+ element.insertAdjacentHTML('beforebegin', getSVG("testdata17"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata4"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata5"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata6"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata7"));
- element.insertAdjacentHTML('beforebegin', getSVG("testdata8"));
+ element.insertAdjacentHTML('beforebegin', getSVG("testc"));
  element.insertAdjacentHTML('beforebegin', getSVG("u6f5f-j"));
+ element.insertAdjacentHTML('beforebegin', getSVG("u8108-j"));
  element.insertAdjacentHTML('beforebegin', getSVG("u51dd"));
  element.insertAdjacentHTML('beforebegin', getSVG("u7fa8"));
+
+ 
  kage.setFont(FONTTYPE.GOTHIC);
+ kage.kFont.kUseCurve = true;
  element.insertAdjacentHTML('beforebegin', getSVG("testdata15"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata25"));
  element.insertAdjacentHTML('beforebegin', getSVG("testdata3"));
@@ -85,15 +99,6 @@ function draw() {
  element.insertAdjacentHTML('beforebegin', getSVG("u7fa8"));
  
 
- /*
- document.write("<textarea>");
- document.write(polygons.generateSVG());
- document.write("</textarea>");
- document.write("<textarea>");
- document.write(polygons.generateEPS());
- document.write("</textarea>");
- document.close();4
- */
  ctx.fillStyle = "rgb(0, 0, 0)";
  
  for(var i = 0; i < polygons.array.length; i++){
