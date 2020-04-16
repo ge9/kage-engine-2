@@ -25,7 +25,6 @@ class Kage {
       }
     }
   }
-  // methods
   makeGlyph(polygons, buhin) { // The word "buhin" means "component".  This method converts buhin (KAGE data format) to polygons (path data).  The variable buhin may represent a component of kanji or a kanji itself.
     var glyphData = this.kBuhin.search(buhin);
     this.makeGlyph2(polygons, glyphData);
@@ -33,16 +32,6 @@ class Kage {
   makeGlyph2(polygons, data) {
       var kageStrokes = this.getStrokes(data);
       polygons.concat(this.kFont.getPolygons(kageStrokes));
-     /* var p = new Polygon();
-      p.push(1,1);
-      p.push(1,100,1);
-      p.push(100,100);
-      p.push(50, 150);
-      p.push(0,100);
-      p.push(50, 50, 1);
-      p.push(0,0);
-      
-      polygons.push(p);*/
   }
   makeGlyph3(data) { // void
     var kageStrokes = this.getStrokes(data);

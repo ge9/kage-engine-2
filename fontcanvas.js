@@ -113,186 +113,113 @@ class FontCanvas {
     }
   }
 
-  drawUpperLeftCorner_v(x1, y1, kMinWidthT) {
+  drawUpperLeftCorner(x1, y1, dir, kMinWidthT) {
+    var p = new PointMaker(x1, y1, dir, kMinWidthT);
     var poly = new Polygon();
-    poly.push(x1 - kMinWidthT, y1);
-    poly.push(x1 + kMinWidthT, y1);
-    poly.push(x1 - kMinWidthT, y1 - kMinWidthT);
-    this.polygons.push(poly);
-  }
-
-  drawUpperLeftCorner(x1, y1, x2, y2, kMinWidthT) {
-    const rad = Math.atan((y2 - y1) / (x2 - x1));
-    const v = (x1 < x2) ? 1 : -1;
-    const XX = Math.sin(rad) * v;
-    const XY = Math.cos(rad) * v * -1;
-    const YX = Math.cos(rad) * v;
-    const YY = Math.sin(rad) * v;
-    var poly = new Polygon();
-    poly.push(x1 - kMinWidthT * XX, y1 - kMinWidthT * XY);
-    poly.push(x1 + kMinWidthT * XX, y1 + kMinWidthT * XY);
-    poly.push(x1 - kMinWidthT * XX - kMinWidthT * YX, y1 - kMinWidthT * XY - kMinWidthT * YY);
+    poly.push2(p.vec(0, 1));
+    poly.push2(p.vec(0, -1));
+    poly.push2(p.vec(-1, 1));
+    poly.reverse();
     this.polygons.push(poly);
   }
 
   drawUpperRightCorner(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth) {
+    var p = new PointMaker(x1, y1);
     var poly = new Polygon();
-    poly.push(x1 - kMinWidthT, y1 - kagekMinWidthY);
-    poly.push(x1, y1 - kagekMinWidthY - kagekWidth);
-    poly.push(x1 + kMinWidthT + kagekWidth, y1 + kagekMinWidthY);
-    poly.push(x1 + kMinWidthT, y1 + kMinWidthT - 1);
-    poly.push(x1 - kMinWidthT, y1 + kMinWidthT + 4);
+    poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
+    poly.push2(p.vec(0,-kagekMinWidthY - kagekWidth));
+    poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
+    poly.push2(p.vec(kMinWidthT,kMinWidthT-1));
+    poly.push2(p.vec(-kMinWidthT,kMinWidthT+4));
     this.polygons.push(poly);
   }
   
   drawUpperRightCorner_straight_v(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth) {//vertical straight line
+    var p = new PointMaker(x1, y1);
     var poly = new Polygon();
-    poly.push(x1 - kMinWidthT, y1 - kagekMinWidthY);
-    poly.push(x1, y1 - kagekMinWidthY - kagekWidth);
-    poly.push(x1 + kMinWidthT + kagekWidth, y1 + kagekMinWidthY);
-    poly.push(x1 + kMinWidthT, y1 + kMinWidthT);
-    poly.push(x1 - kMinWidthT, y1);
+    poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
+    poly.push2(p.vec(0,-kagekMinWidthY - kagekWidth));
+    poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
+    poly.push2(p.vec(kMinWidthT,kMinWidthT));
+    poly.push2(p.vec(-kMinWidthT,0));
     this.polygons.push(poly);
   }
 
-  drawOpenBegin_straight_wrong(x1, y1, kMinWidthT, kagekMinWidthY, rad, v) {
-    const XX = Math.sin(rad) * v;
-    const XY = Math.cos(rad) * v * -1;
-    const YX = Math.cos(rad) * v;
-    const YY = Math.sin(rad) * v;
+  drawOpenBegin_straight(x1, y1, kMinWidthT, kagekMinWidthY, dir) {
+    const rad_offset = Math.atan(kagekMinWidthY*0.5/kMinWidthT);
     var poly = new Polygon();
-    poly.push(x1 + kMinWidthT * XX + (kagekMinWidthY * 0.5) * YX,
-      y1 + kMinWidthT * XY + (kagekMinWidthY * 0.5) * YY);
-    poly.push(x1 + (kMinWidthT + kMinWidthT * 0.5) * XX + (kagekMinWidthY * 0.5 + kagekMinWidthY) * YX,
-      y1 + (kMinWidthT + kMinWidthT * 0.5) * XY + (kagekMinWidthY * 0.5 + kagekMinWidthY) * YY);
-    poly.push(x1 + kMinWidthT * XX + (kagekMinWidthY * 0.5 + kagekMinWidthY * 2) * YX - 2 * XX,
-      y1 + kMinWidthT * XY + (kagekMinWidthY * 0.5 + kagekMinWidthY * 2) * YY + 1 * XY);
+    let p1 = new PointMaker(x1, y1, dir);
+    let[x, y] = p1.vec(kagekMinWidthY*0.5, -kMinWidthT);
+    const offs_sin = Math.sin(rad_offset);
+    const offs_cos = Math.cos(rad_offset);
+    const new_dir = {sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin};
+    let p2 = new PointMaker(x, y, new_dir, kMinWidthT);
+    poly.push2(p2.vec(0, 0));
+    poly.push2(p2.vec(0, -1.4), 2);
+    poly.push2(p2.vec(0.6, -1.4), 2);
+    poly.push2(p2.vec(2.0, 1.0));
     this.polygons.push(poly);
   }
 
-  drawOpenBegin_straight(x1, y1, kMinWidthT, kagekMinWidthY, rad, v) {
-    const XX = Math.sin(rad) * v;
-    const XY = Math.cos(rad) * v * -1;
-    const YX = Math.cos(rad) * v;
-    const YY = Math.sin(rad) * v;
+  drawOpenBegin_curve_down2(x1, y1, dir, kMinWidthT, rad_offset){
     var poly = new Polygon();
-    poly.push(x1 + kMinWidthT * XX + (kagekMinWidthY * 0.5) * YX,
-      y1 + kMinWidthT * XY + (kagekMinWidthY * 0.5) * YY);
-    poly.push(x1 + (kMinWidthT + kMinWidthT * 0.5) * XX + (kagekMinWidthY * 0.5 + kagekMinWidthY) * YX,
-      y1 + (kMinWidthT + kMinWidthT * 0.5) * XY + (kagekMinWidthY * 0.5 + kagekMinWidthY) * YY);
-    poly.push(x1 + (kMinWidthT - 2) * XX + (kagekMinWidthY * 0.5 + kagekMinWidthY * 2 + 1) * YX,
-      y1 + (kMinWidthT - 2) * XY + (kagekMinWidthY * 0.5 + kagekMinWidthY * 2 + 1) * YY);
+    let p1 = new PointMaker(x1, y1, dir);
+    poly.push2(p1.vec(0, kMinWidthT));
+
+    let p2 = new PointMaker();
+    const offs_sin = Math.sin(rad_offset);
+    const offs_cos = Math.cos(rad_offset);
+    p2.setscale(kMinWidthT);
+    p2.setdir({sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin});
+    if(rad_offset>0){
+      poly.push2(p1.vec(-(offs_sin/offs_cos)*2*kMinWidthT, kMinWidthT));
+      let[x, y] = p1.vec(0, -kMinWidthT);
+      poly.push(x, y);
+      p2.setpos(x, y);
+      let[x2, y2] = p2.vec(0, -rad_offset);
+      p2.setpos(x2, y2);
+    }else{
+      let[x, y] = p1.vec(0+2*kMinWidthT*offs_sin, kMinWidthT-2*kMinWidthT*offs_cos);
+      p2.setpos(x, y);
+    }
+
+    poly.push2(p2.vec(0, 0));
+    poly.push2(p2.vec(0, -0.8), 2);
+    poly.push2(p2.vec(0.6, -0.8), 2);
+    poly.push2(p2.vec(1.8, 1.0));
     this.polygons.push(poly);
   }
 
-  drawOpenBegin_straight_v(x1, y1, kMinWidthT, kagekMinWidthY) {
-    var poly = new Polygon();
-    poly.push(x1 + kMinWidthT, y1 + kagekMinWidthY * 0.5);
-    poly.push(x1 + kMinWidthT + kMinWidthT * 0.5, y1 + kagekMinWidthY * 0.5 + kagekMinWidthY);
-    poly.push(x1 + kMinWidthT - 2, y1 + kagekMinWidthY * 0.5 + kagekMinWidthY * 2 + 1);
-    this.polygons.push(poly);
+  drawOpenBegin_curve_down(x1, y1, dir, kMinWidthT, kagekMinWidthY){
+    const rad = Math.atan2(Math.abs(dir.sin), Math.abs(dir.cos));
+    var rad_offset;
+    if(rad > Math.PI * 0.2){//36 degrees
+      rad_offset = (0.1*Math.PI)*(rad-Math.PI * 0.2)/(Math.PI*0.3);
+    }else{
+      rad_offset = (-0.25*Math.PI)*(Math.PI*0.2-rad)/(Math.PI*0.2);
+    }
+    this.drawOpenBegin_curve_down2(x1, y1, dir, kMinWidthT, rad_offset);
   }
 
-  drawOpenBegin_curve_down(x1, y1, sx1, sy1, kMinWidthT, kagekMinWidthY) {
-    var poly;
-    var type;
-    type = (Math.atan2(Math.abs(y1 - sy1), Math.abs(x1 - sx1)) / Math.PI * 2 - 0.4);
-    if (type > 0) {
-      type = type * 2;
-    } else {
-      type = type * 16;
-    }
-    const pm = (type < 0) ? -1 : 1;
-    const rad = Math.atan((sy1 - y1) / (sx1 - x1));
-    const v = (x1 < sx1) ? 1 : -1;
-    const XX = Math.sin(rad) * v;
-    const XY = Math.cos(rad) * v * -1;
-    const YX = Math.cos(rad) * v;
-    const YY = Math.sin(rad) * v;
-    if (x1 == sx1) {
-      poly = new Polygon();
-      poly.push(x1 - kMinWidthT, y1 + 1);
-      poly.push(x1 + kMinWidthT, y1);
-      poly.push(x1 - kMinWidthT * pm, y1 - kagekMinWidthY * type * pm);
-      //if(x1 > x2){
-      //  poly.reverse();
-      //}
-      this.polygons.push(poly);
-    }
-    else {
-      poly = new Polygon();
-      poly.push(x1 - kMinWidthT * XX + 1 * YX, y1 - kMinWidthT * XY + 1 * YY);
-      poly.push(x1 + kMinWidthT * XX, y1 + kMinWidthT * XY);
-      poly.push(x1 - kMinWidthT * pm * XX - kagekMinWidthY * type * pm * YX, y1 - kMinWidthT * pm * XY - kagekMinWidthY * type * pm * YY);
-      //if(x1 > x2){
-      //  poly.reverse();
-      //}
-      this.polygons.push(poly);
-    }
-    ////////////////////
-    if (pm > 0) {
-      type = 0;
-    }
-    const move = kagekMinWidthY * type * pm;
+  drawOpenBegin_curve_up(x1, y1, dir, kMinWidthT, kagekMinWidthY) {
     var poly = new Polygon();
-    if (x1 == sx1) {
-      poly.push(x1 + kMinWidthT, y1 - move);
-      poly.push(x1 + kMinWidthT * 1.5, y1 + kagekMinWidthY - move);
-      poly.push(x1 + kMinWidthT - 2, y1 + kagekMinWidthY * 2 + 1);
-    }
-    else {
-      poly.push(x1 + kMinWidthT * XX - move * YX,
-        y1 + kMinWidthT * XY - move * YY);
-      poly.push(x1 + kMinWidthT * 1.5 * XX + (kagekMinWidthY - move * 1.2) * YX,
-        y1 + kMinWidthT * 1.5 * XY + (kagekMinWidthY - move * 1.2) * YY);
-      poly.push(x1 + (kMinWidthT - 2) * XX + (kagekMinWidthY * 2 - move * 0.8 + 1) * YX,
-        y1 + (kMinWidthT - 2) * XY + (kagekMinWidthY * 2 - move * 0.8 + 1) * YY);
-      //if(x1 < x2){
-      //  poly.reverse();
-      //}
-    }
-    this.polygons.push(poly);
-  }
+    let p1 = new PointMaker(x1, y1, dir);
+    const offs_sin = Math.sin(-0.1*Math.PI);
+    const offs_cos = Math.cos(-0.1*Math.PI);
+    poly.push2(p1.vec(0, -kMinWidthT));
+    poly.push2(p1.vec((offs_sin/offs_cos)*2*kMinWidthT, -kMinWidthT));
 
-  drawOpenBegin_curve_up(x1, y1, sx1, sy1, kMinWidthT, kagekMinWidthY) {
-    const rad = Math.atan((sy1 - y1) / (sx1 - x1));
-    const v = (x1 < sx1) ? 1 : -1;
-    const XX = Math.sin(rad) * v;
-    const XY = Math.cos(rad) * v * -1;
-    const YX = Math.cos(rad) * v;
-    const YY = Math.sin(rad) * v;
-    if (x1 == sx1) {
-      poly = new Polygon();
-      poly.push(x1 - kMinWidthT, y1);
-      poly.push(x1 + kMinWidthT, y1);
-      poly.push(x1 + kMinWidthT, y1 - kagekMinWidthY);
-      this.polygons.push(poly);
-    }
-    else {
-      poly = new Polygon();
-      poly.push(x1 - kMinWidthT * XX, y1 - kMinWidthT * XY);
-      poly.push(x1 + kMinWidthT * XX, y1 + kMinWidthT * XY);
-      poly.push(x1 + kMinWidthT * XX - kagekMinWidthY * YX, y1 + kMinWidthT * XY - kagekMinWidthY * YY);
-      //if(x1 < x2){
-      //  poly.reverse();
-      //}
-      this.polygons.push(poly);
-    }
-    ////////////////////
-    var poly = new Polygon();
-    if (x1 == sx1) {
-      poly.push(x1 - kMinWidthT, y1);
-      poly.push(x1 - kMinWidthT * 1.5, y1 + kagekMinWidthY);
-      poly.push(x1 - kMinWidthT * 0.5, y1 + kagekMinWidthY * 3);
-    }
-    else {
-      poly.push(x1 - kMinWidthT * XX, y1 - kMinWidthT * XY);
-      poly.push(x1 - kMinWidthT * 1.5 * XX + kagekMinWidthY * YX, y1 + kagekMinWidthY * YY - kMinWidthT * 1.5 * XY);
-      poly.push(x1 - kMinWidthT * 0.5 * XX + kagekMinWidthY * 3 * YX, y1 + kagekMinWidthY * 3 * YY - kMinWidthT * 0.5 * XY);
-      //if(x1 < x2){
-      //  poly.reverse();
-      //}
-    }
+    let p2 = new PointMaker();
+    p2.setscale(kMinWidthT);
+    p2.setdir({sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin});
+    let[x, y] = p1.vec(0, kMinWidthT);
+    p2.setpos(x, y);
+
+    poly.push2(p2.vec(0, 0));
+    poly.push2(p2.vec(0, 0.8), 2);
+    poly.push2(p2.vec(0.6, 0.8), 2);
+    poly.push2(p2.vec(1.8, -1.0));
+    poly.reverse();
     this.polygons.push(poly);
   }
 
@@ -321,6 +248,7 @@ class FontCanvas {
     poly.push(x2m - kagekMinWidthY, y2 + kagekMinWidthY * 5);
     poly.push(x2m + kMinWidthT, y2 + kagekMinWidthY);
     poly.push(x2m, y2);
+    poly.reverse();
     this.polygons.push(poly);
   }
 
@@ -330,366 +258,121 @@ class FontCanvas {
     poly.push(x2 - kMinWidthT * 2, y2);
     poly.push(x2 - kagekMinWidthY, y2 + kagekMinWidthY * 5);
     poly.push(x2 + kMinWidthT, y2 + kagekMinWidthY);
+    poly.reverse();
     this.polygons.push(poly);
   }
   
-  drawTailCircle_tan(tailX, tailY, srcX, srcY, r, tan1, tan2) {
-    //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
+  drawTailCircle_tan(tailX, tailY, dir, r, tan1, tan2) {
+    //draw a (semi)circle on the tail of the line to (tailX, tailY)
     var poly = new Polygon();
-    const vec1 = vector_to_len(tan1, r*bez_cir*0.82);
-    const vec2 = vector_to_len(tan2, r*bez_cir*0.84);
-    if (srcX == tailX) {//vertical
-      if (tailY > srcY) {//down
-        poly.push(tailX + r            , tailY);
-        poly.push(tailX + r + vec1[0], tailY + vec1[1], 2);
-        poly.push(tailX + bez_cir*r    , tailY + r*1.02, 2);
-        poly.push(tailX                , tailY + r*1.02);
-        poly.push(tailX - bez_cir*r    , tailY + r*1.02, 2);
-        poly.push(tailX - r + vec2[0], tailY + vec2[1], 2);
-        poly.push(tailX - r            , tailY);
-      } else {
-        poly.push(tailX - r            , tailY);
-        poly.push(tailX - r + vec1[0], tailY + vec1[1], 2);
-        poly.push(tailX - bez_cir*r    , tailY - r*1.02, 2);
-        poly.push(tailX                , tailY - r*1.02);
-        poly.push(tailX + bez_cir*r    , tailY - r*1.02, 2);
-        poly.push(tailX + r + vec2[0], tailY + vec2[1], 2);
-        poly.push(tailX + r            , tailY);
-      }
-    } else if (srcY == tailY) {//horizontal
-      if (tailX > srcX) {//right
-        poly.push(tailX            , tailY - r);
-        poly.push(tailX + vec1[0], tailY - r + vec1[1], 2);
-        poly.push(tailX + r*1.02    , tailY - bez_cir*r, 2);
-        poly.push(tailX + r*1.02    , tailY);
-        poly.push(tailX + r*1.02    , tailY + bez_cir*r, 2);
-        poly.push(tailX + vec2[0], tailY + r + vec2[1], 2);
-        poly.push(tailX            , tailY + r);
-      } else {
-        poly.push(tailX            , tailY + r);
-        poly.push(tailX + vec1[0], tailY + r + vec1[1], 2);
-        poly.push(tailX - r*1.02    , tailY + bez_cir*r, 2);
-        poly.push(tailX - r*1.02    , tailY);
-        poly.push(tailX - r*1.02    , tailY - bez_cir*r, 2);
-        poly.push(tailX + vec2[0], tailY - r + vec2[1], 2);
-        poly.push(tailX            , tailY - r);
-      }
-    }else{
-      var rad = Math.atan((tailY - srcY) / (tailX - srcX));
-      const v =  (srcX < tailX) ? 1 : -1;
-      poly.push(tailX + v*Math.sin(rad) * r            , tailY - v*Math.cos(rad) * r);
-      poly.push(tailX + v*Math.sin(rad) * r + vec1[0], tailY - v*Math.cos(rad) * r + vec1[1], 2);
-      poly.push(tailX + v*Math.cos(rad) * r*1.02 + v*Math.sin(rad) * bez_cir*r,
-                tailY + v*Math.sin(rad) * r*1.02 - v*Math.cos(rad) * bez_cir*r, 2);
-      poly.push(tailX + v*Math.cos(rad) * r*1.02,
-                tailY + v*Math.sin(rad) * r*1.02);
-      poly.push(tailX + v*Math.cos(rad) * r*1.02 - v*Math.sin(rad) * bez_cir*r,
-                tailY + v*Math.sin(rad) * r*1.02 + v*Math.cos(rad) * bez_cir*r, 2);
-      poly.push(tailX - v*Math.sin(rad) * r + vec2[0], tailY + v*Math.cos(rad) * r + vec2[1], 2);
-      poly.push(tailX - v*Math.sin(rad) * r            , tailY + v*Math.cos(rad) * r);      
-    }
+    const vec1 = vector_to_len(tan1, r*bez_cir*0.74);
+    const vec2 = vector_to_len(tan2, r*bez_cir*0.78);
+    let p = new PointMaker(tailX, tailY, dir, r);
+    let [x1, y1] = p.vec(0, -1);
+    let [x2, y2] = p.vec(0, 1);
+    poly.push(x1, y1);
+    poly.push(x1 + vec1[0], y1 + vec1[1], 2);
+    poly.push2(p.vec(0.94,-bez_cir*1.09), 2);
+    poly.push2(p.vec(0.94,0));
+    poly.push2(p.vec(0.94,+bez_cir*1.09), 2);
+    poly.push(x2 + vec2[0], y2 + vec2[1], 2);
+    poly.push(x2, y2);
     this.polygons.push(poly);
   }
 
-  drawTailCircle_slant(tailX, tailY, srcX, srcY, src2X, src2Y, r, tan1, tan2) {
-    const vx = tailX-srcX;
-    const vy = tailY-srcY;
-    const vx2 = tailX-src2X;
-    const vy2 = tailY-src2Y;
-    const vec1 = vector_to_len(tan1, r*bez_cir*0.98);
-    const vec2 = vector_to_len(tan2, r*bez_cir*0.98);
-    
-    let [ia, ib] = unit_normal_vector(vx2, vy2);
+  drawTailCircle(tailX, tailY, dir, r) {
+    //draw a (semi)circle on the tail of the line to (tailX, tailY)
     var poly = new Polygon();
-    const slanted_vec = tan1;
-    const slant_cos = (vx*vx2+vy*vy2)/(Math.sqrt(vx*vx+vy*vy)*Math.sqrt(vx2*vx2+vy2*vy2));
-    const center = vector_to_len(slanted_vec, r/slant_cos);
-    console.log(center, slant_cos);
-    poly.push(tailX - ia*r, tailY - ib*r);
-    poly.push(tailX - ia*r + vec1[0], tailY - ib*r + vec1[1], 2);
-    poly.push(tailX + center[0] - ia*r*bez_cir, tailY + center[1] - ib*r*bez_cir, 2);
-    poly.push(tailX + center[0], tailY + center[1]);
-    poly.push(tailX + center[0] + ia*r*bez_cir, tailY + center[1] + ib*r*bez_cir, 2);
-    poly.push(tailX + ia*r + vec2[0], tailY + ib*r + vec2[1], 2);
-    poly.push(tailX + ia*r, tailY + ib*r);
-
+    var p = new PointMaker(tailX, tailY, dir, r);
+    poly.push2(p.vec(0, -1));
+    poly.push2(p.vec(bez_cir, -1), 2);
+    poly.push2(p.vec(1, -bez_cir), 2);
+    poly.push2(p.vec(1, 0));
+    poly.push2(p.vec(1, bez_cir), 2);
+    poly.push2(p.vec(bez_cir, 1), 2);
+    poly.push2(p.vec(0, 1));
     this.polygons.push(poly);
   }
 
-  drawTailCircle_wrong(tailX, tailY, srcX, srcY, r) {
-    //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
-    //The process for lines directed exactly in the negative x-direction or y-direction is not correct, so it's named as "wrong".
-    if (srcX == tailX) {//vertical
-      this.drawTailCircle_v(tailX, tailY, r);
-    }
-    else if (srcY == tailY) {//horizontal
-      this.drawTailCircle_h(tailX, tailY, r);
-    }
-    else {
-      const rad = Math.atan((tailY - srcY) / (tailX - srcX));
-      const v =  (srcX < tailX) ? 1 : -1;
-      this.drawTailCircle_rad(tailX, tailY, rad, v, r);
-    }
-  }
-
-  drawTailCircle(tailX, tailY, srcX, srcY, r) {
-    //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
-    var rad;
-    var v;
-    if (srcX == tailX) {//vertical
-      if (tailY > srcY) {
-        rad = Math.PI / 2;
-      } else {
-        rad = -Math.PI / 2;
-      }
-      v = 1;
-    } else {
-      rad = Math.atan((tailY - srcY) / (tailX - srcX));
-      if (srcX < tailX) { v = 1; } else { v = -1; }
-    }
-    this.drawTailCircle_rad(tailX, tailY, rad, v, r);
-  }
-
-  drawTailCircle_wrong_c(tailX, tailY, srcX, srcY, r) {
-    //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
-    //The process for lines directed exactly in the negative x-direction or y-direction is not correct, so it's named as "wrong".
-    if (srcX == tailX) {//vertical
-      this.drawTailCircle_v_c(tailX, tailY, r);
-    }
-    else if (srcY == tailY) {//horizontal
-      this.drawTailCircle_h_c(tailX, tailY, r);
-    }
-    else {
-      const rad = Math.atan((tailY - srcY) / (tailX - srcX));
-      const v = (srcX < tailX) ? 1 : -1;
-      this.drawTailCircle_rad_c(tailX, tailY, rad, v, r);
-    }
-  }
-
-  drawTailCircle_c(tailX, tailY, srcX, srcY, r) {
-    //draw a (semi)circle on the tail of the line from (srcX, srcY) to (tailX, tailY)
-    var rad;
-    var v;
-    if (srcX == tailX) {//vertical
-      if (tailY > srcY) {
-        rad = Math.PI / 2;
-      } else {
-        rad = -Math.PI / 2;
-      }
-      v = 1;
-    } else {
-      rad = Math.atan((tailY - srcY) / (tailX - srcX));
-      if (srcX < tailX) { v = 1; } else { v = -1; }
-    }
-    this.drawTailCircle_rad_c(tailX, tailY, rad, v, r);
-  }
-
-  drawTailCircle_h(x2, y2, kMinWidthT2) {
+  drawCircle_bend_pos(x2, y2, dir, kMinWidthT2) {
     var poly = new Polygon();
-    poly.push(x2, y2 - kMinWidthT2);
-    poly.push(x2 + kMinWidthT2 * 0.7, y2 - kMinWidthT2 * 0.7);
-    poly.push(x2 + kMinWidthT2, y2);
-    poly.push(x2 + kMinWidthT2 * 0.7, y2 + kMinWidthT2 * 0.7);
-    poly.push(x2, y2 + kMinWidthT2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle_h_c(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2, y2 - kMinWidthT2);
-    poly.push(x2 + kMinWidthT2 * 0.9, y2 - kMinWidthT2 * 0.9, 1);
-    poly.push(x2 + kMinWidthT2, y2);
-    poly.push(x2 + kMinWidthT2 * 0.9, y2 + kMinWidthT2 * 0.9, 1);
-    poly.push(x2, y2 + kMinWidthT2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle_h_neg_c(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2, y2 - kMinWidthT2);
-    poly.push(x2 - kMinWidthT2 * 0.9, y2 - kMinWidthT2 * 0.9, 1);
-    poly.push(x2 - kMinWidthT2, y2);
-    poly.push(x2 - kMinWidthT2 * 0.9, y2 + kMinWidthT2 * 0.9, 1);
-    poly.push(x2, y2 + kMinWidthT2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle2_h(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2, y2 - kMinWidthT2);
-    poly.push(x2 + kMinWidthT2 * 0.6, y2 - kMinWidthT2 * 0.6);
-    poly.push(x2 + kMinWidthT2, y2);
-    poly.push(x2 + kMinWidthT2 * 0.6, y2 + kMinWidthT2 * 0.6);
-    poly.push(x2, y2 + kMinWidthT2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle2_h_neg(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2, y2 - kMinWidthT2);
-    poly.push(x2 - kMinWidthT2 * 0.6, y2 - kMinWidthT2 * 0.6);
-    poly.push(x2 - kMinWidthT2, y2);
-    poly.push(x2 - kMinWidthT2 * 0.6, y2 + kMinWidthT2 * 0.6);
-    poly.push(x2, y2 + kMinWidthT2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle_v(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2 - kMinWidthT2, y2);
-    poly.push(x2 - kMinWidthT2 * 0.7, y2 + kMinWidthT2 * 0.7);
-    poly.push(x2, y2 + kMinWidthT2);
-    poly.push(x2 + kMinWidthT2 * 0.7, y2 + kMinWidthT2 * 0.7);
-    poly.push(x2 + kMinWidthT2, y2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle2_v(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2 - kMinWidthT2, y2);
-    poly.push(x2 - kMinWidthT2 * 0.6, y2 + kMinWidthT2 * 0.6);
-    poly.push(x2, y2 + kMinWidthT2);
-    poly.push(x2 + kMinWidthT2 * 0.6, y2 + kMinWidthT2 * 0.6);
-    poly.push(x2 + kMinWidthT2, y2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle_v_c(x2, y2, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2 - kMinWidthT2, y2);
-    poly.push(x2 - kMinWidthT2 * 0.9, y2 + kMinWidthT2 * 0.9, 1);
-    poly.push(x2, y2 + kMinWidthT2);
-    poly.push(x2 + kMinWidthT2 * 0.9, y2 + kMinWidthT2 * 0.9, 1);
-    poly.push(x2 + kMinWidthT2, y2);
-    this.polygons.push(poly);
-  }
-  drawTailCircle_rad(x2, y2, rad, v, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2 + Math.sin(rad) * kMinWidthT2 * v, y2 - Math.cos(rad) * kMinWidthT2 * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT2 * 0.7 * v + Math.sin(rad) * kMinWidthT2 * 0.7 * v,
-      y2 + Math.sin(rad) * kMinWidthT2 * 0.7 * v - Math.cos(rad) * kMinWidthT2 * 0.7 * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT2 * v, y2 + Math.sin(rad) * kMinWidthT2 * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT2 * 0.7 * v - Math.sin(rad) * kMinWidthT2 * 0.7 * v,
-      y2 + Math.sin(rad) * kMinWidthT2 * 0.7 * v + Math.cos(rad) * kMinWidthT2 * 0.7 * v);
-    poly.push(x2 - Math.sin(rad) * kMinWidthT2 * v, y2 + Math.cos(rad) * kMinWidthT2 * v);
-    this.polygons.push(poly);
-  }
-  drawKAGICircle_rad(x2, y2, rad, v, kMinWidthT) {//0.8 -> 0.6?
-    var poly = new Polygon();
-    poly.push(x2 + Math.sin(rad) * kMinWidthT * v, y2 - Math.cos(rad) * kMinWidthT * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT * 0.8 * v + Math.sin(rad) * kMinWidthT * 0.6 * v,
-      y2 + Math.sin(rad) * kMinWidthT * 0.8 * v - Math.cos(rad) * kMinWidthT * 0.6 * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT * v, y2 + Math.sin(rad) * kMinWidthT * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT * 0.8 * v - Math.sin(rad) * kMinWidthT * 0.6 * v,
-      y2 + Math.sin(rad) * kMinWidthT * 0.8 * v + Math.cos(rad) * kMinWidthT * 0.6 * v);
-    poly.push(x2 - Math.sin(rad) * kMinWidthT * v, y2 + Math.cos(rad) * kMinWidthT * v);
-    this.polygons.push(poly);
-  }
-  drawTailCircle_rad_c(x2, y2, rad, v, kMinWidthT2) {
-    var poly = new Polygon();
-    poly.push(x2 + Math.sin(rad) * kMinWidthT2 * v, y2 - Math.cos(rad) * kMinWidthT2 * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT2 * 0.9 * v + Math.sin(rad) * kMinWidthT2 * 0.9 * v,
-      y2 + Math.sin(rad) * kMinWidthT2 * 0.9 * v - Math.cos(rad) * kMinWidthT2 * 0.9 * v, 1);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT2 * v, y2 + Math.sin(rad) * kMinWidthT2 * v);
-    poly.push(x2 + Math.cos(rad) * kMinWidthT2 * 0.9 * v - Math.sin(rad) * kMinWidthT2 * 0.9 * v,
-      y2 + Math.sin(rad) * kMinWidthT2 * 0.9 * v + Math.cos(rad) * kMinWidthT2 * 0.9 * v, 1);
-    poly.push(x2 - Math.sin(rad) * kMinWidthT2 * v, y2 + Math.cos(rad) * kMinWidthT2 * v);
+    var p = new PointMaker(x2, y2, dir, kMinWidthT2);
+    poly.push2(p.vec(0, -1));
+    poly.push2(p.vec(1.5, -1), 2);
+    poly.push2(p.vec(0.9,  1), 2);
+    poly.push2(p.vec(-1,  1));
     this.polygons.push(poly);
   }
 
-  drawL2RSweepEnd(x2, y2, sx2, sy2, kMinWidthT, kagekL2RDfatten) {
-    const rad = Math.atan((y2 - sy2) / (x2 - sx2));
-    const v = (sx2 < x2) ? 1 : -1;
-    const YX = Math.sin(rad) * v * -1;
-    const YY = Math.cos(rad) * v;
-    const XX = Math.cos(rad) * v;
-    const XY = Math.sin(rad) * v;
-    var type = (Math.atan2(Math.abs(y2 - sy2), Math.abs(x2 - sx2)) / Math.PI * 2 - 0.6);
+  drawCircle_bend_neg(x2, y2, dir, kMinWidthT2) {
+    var poly = new Polygon();
+    var p = new PointMaker(x2, y2, dir, kMinWidthT2);
+    poly.push2(p.vec(0, 1));
+    poly.push2(p.vec(1.5, 1), 2);
+    poly.push2(p.vec(0.9,  -1), 2);
+    poly.push2(p.vec(-1,  -1));
+    poly.reverse();
+    this.polygons.push(poly);
+  }
+
+  drawL2RSweepEnd(x2, y2, dir, kMinWidthT, kagekL2RDfatten) {
+    var type = (Math.atan2(Math.abs(dir.sin), Math.abs(dir.cos)) / Math.PI * 2 - 0.6);
     if (type > 0) {
       type = type * 8;
     } else {
       type = type * 3;
     }
     const pm = (type < 0) ? -1 : 1;
+    var p = new PointMaker(x2, y2, dir);
     var poly = new Polygon();
-    if (sy2 == y2) {
-      poly.push(x2, y2 + kMinWidthT * kagekL2RDfatten);
-      poly.push(x2, y2 - kMinWidthT * kagekL2RDfatten);
-      poly.push(x2 + kMinWidthT * kagekL2RDfatten * Math.abs(type), y2 + kMinWidthT * kagekL2RDfatten * pm);
-    } else {
-      poly.push(x2 + kMinWidthT * kagekL2RDfatten * YX, y2 + kMinWidthT * kagekL2RDfatten * YY);
-      poly.push(x2 - kMinWidthT * kagekL2RDfatten * YX, y2 - kMinWidthT * kagekL2RDfatten * YY);
-      poly.push(x2 + kMinWidthT * kagekL2RDfatten * Math.abs(type) * XX + kMinWidthT * kagekL2RDfatten * pm * YX,
-        y2 + kMinWidthT * kagekL2RDfatten * Math.abs(type) * XY + kMinWidthT * kagekL2RDfatten * pm * YY);
-    }
+    poly.push2(p.vec(0, kMinWidthT * kagekL2RDfatten));
+    poly.push2(p.vec(0, -kMinWidthT * kagekL2RDfatten));
+    poly.push2(p.vec(kMinWidthT * kagekL2RDfatten * Math.abs(type), kMinWidthT * kagekL2RDfatten * pm));
     this.polygons.push(poly);
   }
 
-  drawTurnUpwards_Bending_pos_h(x2, y2, kMinWidthT, kagekWidth, opt1, kagekAdjustMageStep) {
+  drawTurnUpwards_pos(x2, y2, kMinWidthT, length_param, dir) {
     var poly = new Polygon();
-    //poly.push(x2, y2 - kMinWidthT + 1);
-    poly.push(x2, y2 - kMinWidthT);
-    poly.push(x2 + 2, y2 - kMinWidthT - kagekWidth * (4 * (1 - opt1 / kagekAdjustMageStep) + 1));
-    poly.push(x2, y2 - kMinWidthT - kagekWidth * (4 * (1 - opt1 / kagekAdjustMageStep) + 1));
-    //poly.push(x2 - kMinWidthT, y2 - kMinWidthT + 1);
-    poly.push(x2 - kMinWidthT, y2 - kMinWidthT);
-    //poly.reverse(); // for fill-rule
-    this.polygons.push(poly);
-  }
-  drawTurnUpwards_Bending_pos(x2, y2, kMinWidthT, kagekWidth, rad, v) {
-    var poly = new Polygon();
-    poly.push(x2 + (kMinWidthT - 1) * Math.sin(rad) * v, y2 - (kMinWidthT - 1) * Math.cos(rad) * v);
-    poly.push(x2 + 2 * Math.cos(rad) * v + (kMinWidthT + kagekWidth * 5) * Math.sin(rad) * v,
-      y2 + 2 * Math.sin(rad) * v - (kMinWidthT + kagekWidth * 5) * Math.cos(rad) * v);
-    poly.push(x2 + (kMinWidthT + kagekWidth * 5) * Math.sin(rad) * v,
-      y2 - (kMinWidthT + kagekWidth * 5) * Math.cos(rad) * v);
-    poly.push(x2 + (kMinWidthT - 1) * Math.sin(rad) * v - kMinWidthT * Math.cos(rad) * v,
-      y2 - (kMinWidthT - 1) * Math.cos(rad) * v - kMinWidthT * Math.sin(rad) * v);
-    this.polygons.push(poly);
-  }
-  drawTurnUpwards_Bending_neg_h(x2, y2, kMinWidthT, kagekWidth, opt1, kagekAdjustMageStep) {
-    var poly = new Polygon();
-    //poly.push(x2, y2 - kMinWidthT + 1);
-    poly.push(x2, y2 - kMinWidthT);
-    poly.push(x2 - 2, y2 - kMinWidthT - kagekWidth * (4 * (1 - opt1 / kagekAdjustMageStep) + 1));
-    poly.push(x2, y2 - kMinWidthT - kagekWidth * (4 * (1 - opt1 / kagekAdjustMageStep) + 1));
-    //poly.push(x2 + kMinWidthT, y2 - kMinWidthT + 1);
-    poly.push(x2 + kMinWidthT, y2 - kMinWidthT);
-    //poly.reverse(); // for fill-rule
-    this.polygons.push(poly);
-  }
-  drawTurnUpwards_Bending_neg(x2, y2, kMinWidthT, kagekWidth, rad, v) {
-    var poly = new Polygon();
-    poly.push(x2 - (kMinWidthT - 1) * Math.sin(rad) * v, y2 + (kMinWidthT - 1) * Math.cos(rad) * v);
-    poly.push(x2 + 2 * Math.cos(rad) * v - (kMinWidthT + kagekWidth * 5) * Math.sin(rad) * v,
-      y2 + 2 * Math.sin(rad) * v + (kMinWidthT + kagekWidth * 5) * Math.cos(rad) * v);
-    poly.push(x2 - (kMinWidthT + kagekWidth * 5) * Math.sin(rad) * v,
-      y2 + (kMinWidthT + kagekWidth * 5) * Math.cos(rad) * v);
-    poly.push(x2 + (kMinWidthT - 1) * Math.sin(rad) * v - kMinWidthT * Math.cos(rad) * v,
-      y2 - (kMinWidthT - 1) * Math.cos(rad) * v - kMinWidthT * Math.sin(rad) * v);
-    this.polygons.push(poly);
-  }
-  drawTurnUpwards_CurveBezier(y1, x2, y2, kMinWidthT, kagekWidth) {
-    //ENDTYPE = TURN_UPWARDS
-    //this method is used in STROKETYPE=CURVE(2) or BEZIER(6), and not in BENDING(3) or BENDING_ROUND(4)
-    //The angle is fixed(always upwards).
-    var poly = new Polygon();
-    if (y1 < y2) {
-      poly.push(x2, y2 - kMinWidthT + 1);
-      poly.push(x2 + 2, y2 - kMinWidthT - kagekWidth * 5);
-      poly.push(x2, y2 - kMinWidthT - kagekWidth * 5);
-      poly.push(x2 - kMinWidthT, y2 - kMinWidthT + 1);
-    } else {
-      poly.push(x2, y2 + kMinWidthT - 1);
-      poly.push(x2 - 2, y2 + kMinWidthT + kagekWidth * 5);
-      poly.push(x2, y2 + kMinWidthT + kagekWidth * 5);
-      poly.push(x2 + kMinWidthT, y2 + kMinWidthT - 1);
-    }
+    var p = new PointMaker(x2, y2, dir);
+    poly.push2(p.vec(kMinWidthT*0.7,  - kMinWidthT*0.7));
+    poly.push2(p.vec(0, - kMinWidthT),2);
+    poly.push2(p.vec(kMinWidthT*0.3, - kMinWidthT - length_param/2), 2);
+    poly.push2(p.vec(kMinWidthT*0.5, - kMinWidthT - length_param));
+    poly.push2(p.vec(0,  - kMinWidthT - length_param));
+    poly.push2(p.vec( - kMinWidthT*0.6, - kMinWidthT - length_param/4), 2);
+    poly.push2(p.vec( - kMinWidthT*1.8, - kMinWidthT), 2);
+    poly.push2(p.vec( - kMinWidthT*2.2, - kMinWidthT));
+    
+    poly.reverse(); // for fill-rule
     this.polygons.push(poly);
   }
 
-  drawTurnLeft(x2, y2, opt2, kMinWidthT, kagekWidth, kagekMinWidthT) {
+  drawTurnUpwards_neg(x2, y2, kMinWidthT, length_param, dir) {
     var poly = new Polygon();
-    poly.push(x2, y2);
-    poly.push(x2, y2 - kMinWidthT);
-    poly.push(x2 - kagekWidth * 4 * Math.min(1 - opt2 / 10, Math.pow(kMinWidthT / kagekMinWidthT, 3)), y2 - kMinWidthT);
-    poly.push(x2 - kagekWidth * 4 * Math.min(1 - opt2 / 10, Math.pow(kMinWidthT / kagekMinWidthT, 3)), y2 - kMinWidthT * 0.5);
-    //poly.reverse();
+    var p = new PointMaker(x2, y2, dir);
+    poly.push2(p.vec(kMinWidthT*0.7, kMinWidthT*0.7));
+    poly.push2(p.vec(0, kMinWidthT),2);
+    poly.push2(p.vec(kMinWidthT*0.3, kMinWidthT + length_param/2), 2);
+    poly.push2(p.vec(kMinWidthT*0.5, kMinWidthT + length_param));
+    poly.push2(p.vec(0, kMinWidthT + length_param));
+    poly.push2(p.vec( - kMinWidthT*0.6, kMinWidthT + length_param/4), 2);
+    poly.push2(p.vec( - kMinWidthT*1.8, kMinWidthT), 2);
+    poly.push2(p.vec( - kMinWidthT*2.2, kMinWidthT));
     this.polygons.push(poly);
   }
+  
+  drawTurnLeft(x2, y2, kMinWidthT, length_param) {
+    var poly = new Polygon();
+    poly.push(x2, y2 - kMinWidthT);
+    poly.push(x2 - length_param, y2 - kMinWidthT);
+    poly.push(x2 - length_param, y2 - kMinWidthT * 0.5);
+    poly.push(x2 - kMinWidthT*0.7, y2 - kMinWidthT * 0.3,2);
+    poly.push(x2, y2 + kMinWidthT * 0.3, 2);
+    poly.push(x2, y2 + kMinWidthT);
+    poly.reverse();
+    this.polygons.push(poly);
+  }
+
   drawUroko_h(x2, y2, kagekMinWidthY, urokoX, urokoY) {
     var poly = new Polygon();
     poly.push(x2, y2 - kagekMinWidthY);
@@ -697,75 +380,25 @@ class FontCanvas {
     poly.push(x2 - urokoX / 2, y2 - urokoY);
     this.polygons.push(poly);
   }
-  drawUroko(x2, y2, x1, y1, kagekMinWidthY, urokoX, urokoY) {
-    const rad = Math.atan((y2 - y1) / (x2 - x1));
+
+  drawUroko(x2, y2, dir, kagekMinWidthY, urokoX, urokoY) {
     var poly = new Polygon();
-    poly.push(x2 + Math.sin(rad) * kagekMinWidthY, y2 - Math.cos(rad) * kagekMinWidthY);
-    poly.push(x2 - Math.cos(rad) * urokoX, y2 - Math.sin(rad) * urokoX);
-    //poly.push(x2 - Math.cos(rad) * urokoX / 2 + Math.sin(rad) * urokoX / 2, y2 - Math.sin(rad) * urokoY - Math.cos(rad) * urokoY);
-    //should be fixed as following:
-    poly.push(x2 - Math.cos(rad) * urokoX / 2 + Math.sin(rad) * urokoY, y2 - Math.sin(rad) * urokoX / 2 - Math.cos(rad) * urokoY);
+    poly.push(x2 + dir.sin * kagekMinWidthY, y2 - dir.cos * kagekMinWidthY);
+    poly.push(x2 - dir.cos * urokoX, y2 - dir.sin * urokoX);
+    poly.push(x2 - dir.cos * urokoX / 2 + dir.sin * urokoY, y2 - dir.sin * urokoX / 2 - dir.cos * urokoY);
     this.polygons.push(poly);
   }
 
   drawLine(x1, y1, x2, y2, halfWidth) {
     //draw a line(rectangle).
-    var poly = new Polygon(4);
-    if (x1 == x2) {//vertical
-      poly.set(0, x1 - halfWidth, y1);
-      poly.set(1, x2 - halfWidth, y2);
-      poly.set(2, x2 + halfWidth, y2);
-      poly.set(3, x1 + halfWidth, y1);
-      //clockwise if y2<y1 (need reversing?)
-    } else if (y1 == y2) {//horizontal
-      poly.set(0, x1, y1 - halfWidth);
-      poly.set(1, x2, y2 - halfWidth);
-      poly.set(2, x2, y2 + halfWidth);
-      poly.set(3, x1, y1 + halfWidth);
-      //clockwise if x1<x2
-    } else {
-      rad = Math.atan((y2 - y1) / (x2 - x1));
-      poly.set(0, x1 + Math.sin(rad) * halfWidth, y1 - Math.cos(rad) * halfWidth);
-      poly.set(1, x2 + Math.sin(rad) * halfWidth, y2 - Math.cos(rad) * halfWidth);
-      poly.set(2, x2 - Math.sin(rad) * halfWidth, y2 + Math.cos(rad) * halfWidth);
-      poly.set(3, x1 - Math.sin(rad) * halfWidth, y1 + Math.cos(rad) * halfWidth);
-    }
-    this.polygons.push(poly);
-  }
-
-  drawOffsetLine_wrong(x1, y1, x2, y2, halfWidth, off_left1, off_right1, off_left2, off_right2) {
-    //Draw a line(rectangle), and adjust the rectangle to trapezoid.
-    //off_left1 means how much the start point of the left side (seeing from (x1, y1)) of the rectangle is stretched.
-    //Note that the positive Y-axis goes in the downwards.
-    //off_left2 deals with the end point.  The right side is managed similarly.
-    //The process for lines directed exactly in the negative x-direction or y-direction is not correct, so it's named as "wrong".
-    //The generated polygon will be clockwise (unless "wrong" input is given).
-    var poly = new Polygon(4);
-    if (x1 == x2) { //vertical
-      poly.set(3, x1 - halfWidth, y1 - off_right1);
-      poly.set(0, x1 + halfWidth, y1 - off_left1);
-
-      poly.set(2, x2 - halfWidth, y2 + off_right2);
-      poly.set(1, x2 + halfWidth, y2 + off_left2);
-    } else if (y1 == y2) {//horizontal
-      poly.set(0, x1 - off_left1, y1 - halfWidth);
-      poly.set(3, x1 - off_right1, y1 + halfWidth);
-
-      poly.set(1, x2 + off_left2, y2 - halfWidth);
-      poly.set(2, x2 + off_right2, y2 + halfWidth);
-    } else {
-      rad = Math.atan((y2 - y1) / (x2 - x1));
-      if (x1 > x2) { v = -1; } else { v = 1; }
-      poly.set(0, x1 + Math.sin(rad) * halfWidth * v - Math.cos(rad) * off_left1 * v,
-        y1 - Math.cos(rad) * halfWidth * v - Math.sin(rad) * off_left1 * v);
-      poly.set(3, x1 - Math.sin(rad) * halfWidth * v - Math.cos(rad) * off_right1 * v,
-        y1 + Math.cos(rad) * halfWidth * v - Math.sin(rad) * off_right1 * v);
-
-      poly.set(1, x2 + Math.sin(rad) * halfWidth * v + off_left2 * Math.cos(rad) * v,
-        y2 - Math.cos(rad) * halfWidth * v + off_left2 * Math.sin(rad) * v);
-      poly.set(2, x2 - Math.sin(rad) * halfWidth * v + off_right2 * Math.cos(rad) * v,
-        y2 + Math.cos(rad) * halfWidth * v + off_right2 * Math.sin(rad) * v);
-    }
+    var poly = new Polygon;
+    const dir = get_dir(x2-x1, y2-y1);
+    let p = new PointMaker(x1, y1, dir);
+    poly.push2(p.vec(0, halfWidth));
+    poly.push2(p.vec(0, -halfWidth));
+    p.setpos(x2, y2);
+    poly.push2(p.vec(0, -halfWidth));
+    poly.push2(p.vec(0, halfWidth));
     this.polygons.push(poly);
   }
 
@@ -775,48 +408,14 @@ class FontCanvas {
     //Note that the positive Y-axis goes in the downwards.
     //off_left2 deals with the end point.  The right side is managed similarly.
     //The generated polygon will be clockwise.
-    var poly = new Polygon(4);
-    if (x1 == x2) { //vertical
-      if (y1 < y2) {
-        poly.set(0, x1 - halfWidth, y1 - off_right1);
-        poly.set(1, x1 + halfWidth, y1 - off_left1);
-
-        poly.set(3, x2 - halfWidth, y2 + off_right2);
-        poly.set(2, x2 + halfWidth, y2 + off_left2);
-      } else {
-        poly.set(0, x1 + halfWidth, y1 + off_right1);
-        poly.set(1, x1 - halfWidth, y1 + off_left1);
-
-        poly.set(3, x2 + halfWidth, y2 - off_right2);
-        poly.set(2, x2 - halfWidth, y2 - off_left2);
-      }
-    } else if (y1 == y2) {//horizontal
-      if (x1 < x2) {
-        poly.set(1, x1 - off_left1, y1 - halfWidth);
-        poly.set(0, x1 - off_right1, y1 + halfWidth);
-
-        poly.set(2, x2 + off_left2, y2 - halfWidth);
-        poly.set(3, x2 + off_right2, y2 + halfWidth);
-      } else {
-        poly.set(1, x1 + off_left1, y1 + halfWidth);
-        poly.set(0, x1 + off_right1, y1 - halfWidth);
-
-        poly.set(2, x2 - off_left2, y2 + halfWidth);
-        poly.set(3, x2 - off_right2, y2 - halfWidth);
-      }
-    } else {
-      rad = Math.atan((y2 - y1) / (x2 - x1));
-      if (x1 > x2) { v = -1; } else { v = 1; }
-      poly.set(1, x1 + Math.sin(rad) * halfWidth * v - Math.cos(rad) * off_left1 * v,
-        y1 - Math.cos(rad) * halfWidth * v - Math.sin(rad) * off_left1 * v);
-      poly.set(0, x1 - Math.sin(rad) * halfWidth * v - Math.cos(rad) * off_right1 * v,
-        y1 + Math.cos(rad) * halfWidth * v - Math.sin(rad) * off_right1 * v);
-
-      poly.set(2, x2 + Math.sin(rad) * halfWidth * v + off_left2 * Math.cos(rad) * v,
-        y2 - Math.cos(rad) * halfWidth * v + off_left2 * Math.sin(rad) * v);
-      poly.set(3, x2 - Math.sin(rad) * halfWidth * v + off_right2 * Math.cos(rad) * v,
-        y2 + Math.cos(rad) * halfWidth * v + off_right2 * Math.sin(rad) * v);
-    }
+    var poly = new Polygon;
+    const dir = get_dir(x2-x1, y2-y1);
+    let p = new PointMaker(x1, y1, dir);
+    poly.push2(p.vec(-off_right1, halfWidth));
+    poly.push2(p.vec(-off_left1, -halfWidth));
+    p.setpos(x2, y2);
+    poly.push2(p.vec(off_left2, -halfWidth));
+    poly.push2(p.vec(off_right2, halfWidth));
     this.polygons.push(poly);
   }
 
@@ -828,6 +427,12 @@ class FontCanvas {
   }
   drawQBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step) {
     let [bez1, bez2] = Bezier.qBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step);
+    var poly = Bezier.bez_to_poly(bez1);
+    poly.concat(Bezier.bez_to_poly(bez2));
+    this.polygons.push(poly);
+  }
+  drawQBezier2(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step) {
+    let [bez1, bez2] = Bezier.qBezier2(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step);
     var poly = Bezier.bez_to_poly(bez1);
     poly.concat(Bezier.bez_to_poly(bez2));
     this.polygons.push(poly);

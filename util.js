@@ -4,52 +4,70 @@ const bez_cir = 4*(Math.sqrt(2)-1)/3;
 //width functions (using circle)
 function widfun(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  const p = 1+ (100/len);
-  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.815+0.185  )*wid;
+  const p = 1 + (100/len);
+  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.778+0.222  )*wid;
 }
 
 function widfun_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  const p = 1+ (100/len);
-  return wid*0.815*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+  const p = 1 + (100/len);
+  return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+}
+
+function widfun_stop(t, x1, y1, x2, y2, wid){
+  const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  const p = 1 + (100/len);
+  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.878+0.222  )*wid;
+}
+
+function widfun_stop_d(t, x1, y1, x2, y2, wid){
+  const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  const p = 1 + (100/len);
+  return wid*0.878*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
 }
 
 //fat version (used in cubic bezier)
 function widfun_fat(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1+ (40/len);
-  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.815+0.185  )*wid;
+  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.778+0.222  )*wid;
 }
 
 function widfun_fat_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1+ (40/len);
-  return wid*0.815*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+  return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
 }
 
+function get_dir(x, y){
+  if (y==0){
+    if(x<0){
+      return {sin: 0, cos: -1};
+    }else{
+      return {sin: 0, cos:  1};
+    }
+  }else if(x==0){
+    if(y<0){
+      return {sin: -1, cos: 0};
+    }else{
+      return {sin:  1, cos: 0};
+    }
+  }else{
+    const rad = Math.atan2(y, x);
+    return {sin:  Math.sin(rad), cos: Math.cos(rad)};
+  }
+}
+const DIR_POSX = {sin: 0, cos: 1};
+const DIR_POSY = {sin: 1, cos: 0};
+const DIR_NEGX = {sin: 0, cos: -1};
+const DIR_NEGY = {sin: -1, cos: 0};
+
+function moved_point(x, y, dir, delta){
+  return [x + delta*dir.cos, y + delta*dir.sin];
+}
 function get_extended_dest(destX, destY, srcX, srcY, delta) {
-  //Assume that there's a line from (srcX, srcY) to (destX, destY).
-  //This function stretches the line to the "dest" side by the length of the variable delta, 
-  //and returns the new destination coordinates (in array).
-  //if delta is negative, the line will be shortened, and the destination will be nearer to the source.
-  var destX_new = destX;
-  var destY_new = destY;
-  if (srcX == destX) {
-    if (srcY < destY) { destY_new = destY + delta; }
-    else { destY_new = destY - delta; }
-  }
-  else if (srcY == destY) {
-    if (srcX < destX) { destX_new = destX + delta; }
-    else { destX_new = destX - delta; }
-  }
-  else {
-    var v;
-    rad = Math.atan((destY - srcY) / (destX - srcX));
-    if (srcX < destX) { v = 1; } else { v = -1; }
-    destX_new = destX + delta * Math.cos(rad) * v;
-    destY_new = destY + delta * Math.sin(rad) * v;
-  }
-  return [destX_new, destY_new]
+  const dir = get_dir(destX - srcX, destY - srcY);
+  return moved_point(destX, destY, dir, delta);
 }
 
 function get_extended_dest_wrong(destX, destY, srcX, srcY, delta) {
@@ -149,7 +167,12 @@ function stretch_bezier_end(bez, t){
                (1-t) * (1-t) * (1-t) * bez[0][1] + 3 * t * (1-t) * (1-t) * bez[1][1] + 3 * t * t * (1-t) * bez[2][1] + t * t * t * bez[3][1],]
   return [start, c1, c2, end];
 }
-
+function bezier_to_y(bez, y){
+  const res = shorten_bezier_to_y(bez, y);
+  if(res){return res;}else{
+    return extend_bezier_to_y(bez, y);
+  }
+}
 function extend_bezier_to_y(bez, y) {
   const a =     bez[3][1] - 3 * bez[2][1] + 3 * bez[1][1] - bez[0][1];
   const b = 3 * bez[2][1] - 6 * bez[1][1] + 3 * bez[0][1];

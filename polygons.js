@@ -51,37 +51,37 @@ class Polygons{
       this.push(polygon);
     }
   }
-  generateSVG(curve){ // string
+  generateSVG(){ // string
     var buffer = "";
     buffer += "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" baseProfile=\"full\" viewBox=\"0 0 200 200\" width=\"200\" height=\"200\">\n";
-    if(curve){
-      for(var i = 0; i < this.array.length; i++){
-        buffer += "<path d=\"M ";
-        buffer += this.array[i].array[0].x + "," + this.array[i].array[0].y + " ";
-        for(var j = 1; j < this.array[i].array.length; j++){
-          if(this.array[i].array[j].off == 1){
-            buffer += "Q ";
-          } else if(this.array[i].array[j].off == 2 && this.array[i].array[j - 1].off == 0){
-            buffer += "C ";
-          } else if(this.array[i].array[j].off == 0 && this.array[i].array[j - 1].off == 0){
-            buffer += "L ";
-          }
-          buffer += this.array[i].array[j].x + "," + this.array[i].array[j].y + " ";
-        }
-        buffer += "Z\" fill=\"black\" />\n";
-      }
-      buffer += "</svg>\n";
-    } else {
-      buffer += "<g fill=\"black\">\n";
-      for(var i = 0; i < this.array.length; i++){
-        buffer += "<polygon points=\"";
-        for(var j = 0; j < this.array[i].array.length; j++){
-          buffer += this.array[i].array[j].x + "," + this.array[i].array[j].y + " ";
-        }
-        buffer += "\" />\n";
-      }
-      buffer += "</g>\n";
-      buffer += "</svg>\n";
+    for(var i = 0; i < this.array.length; i++){
+      buffer += "<path d=\"";
+      buffer += this.array[i].get_sub_path_svg();
+      buffer += "\" fill=\"black\" />\n";
+    }
+    buffer += "</svg>\n";
+    return buffer;
+  }
+  generateSVG2(){ // string
+    var buffer = "";
+    buffer += "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" baseProfile=\"full\" viewBox=\"0 0 200 200\" width=\"200\" height=\"200\">\n";
+    buffer += "<path d=\"";
+    buffer += this.get_path_svg();
+    buffer += "\" fill=\"black\" />\n";
+    buffer += "</svg>\n";
+    return buffer;
+  }
+  get_path_svg(){
+    var buffer = "";
+    for(var i = 0; i < this.array.length; i++){
+      buffer += this.array[i].get_sub_path_svg();
+    }
+    return buffer;
+  }
+  get_path_svg_font(){
+    var buffer = "";
+    for(var i = 0; i < this.array.length; i++){
+      buffer += this.array[i].get_sub_path_svg_font();
     }
     return buffer;
   }
