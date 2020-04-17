@@ -572,13 +572,13 @@ class Mincho {
     if (a1 == 132 && x1 != sx) {
       let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
       if (b1) { bez2[bez2.length - 1] = b1; }
-      var temp = bez1[0];
+      var temp = bez1[0].concat();//deep copy
       let b2 = bezier_to_y(temp.reverse(), y1);
       if (b2) { bez1[0] = b2.reverse(); }
     } else if (a1 == 22 && x1 != sx && y1 > y2) {
       let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
       if (b1) { bez2[bez2.length - 1] = b1; }
-      var temp = bez1[0];
+      var temp = bez1[0].concat();//deep copy
       let b2 = bezier_to_y(temp.reverse(), y1 + 1);//??
       if (b2) { bez1[0] = b2.reverse(); }
     }
