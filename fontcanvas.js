@@ -129,8 +129,9 @@ class FontCanvas {
     poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
     poly.push2(p.vec(0,-kagekMinWidthY - kagekWidth));
     poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
-    poly.push2(p.vec(kMinWidthT,kMinWidthT-1));
-    poly.push2(p.vec(-kMinWidthT,kMinWidthT+4));
+    poly.push2(p.vec(kMinWidthT,kMinWidthT*0.8), 2);
+    poly.push2(p.vec(0,kMinWidthT*1.2), 2);
+    poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
     this.polygons.push(poly);
   }
   

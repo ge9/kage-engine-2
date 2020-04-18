@@ -555,6 +555,10 @@ class Mincho {
         width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
       }
+      else if (a1 == STARTTYPE.CONNECTING_V && a2 == ENDTYPE.OPEN) { //未使用。さんずい用 (実験)
+        width_func = t => {return ((1-t)*0.628+Math.pow((1-t),30)*0.600+0.222)*this.kMinWidthT};
+        width_func_d = t => {return (-0.628-30*Math.pow((1-t),29)*0.600)*this.kMinWidthT};
+      }
       else if (a1 == STARTTYPE.THIN) {
         width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT);
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT);
