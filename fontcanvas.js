@@ -148,11 +148,13 @@ class FontCanvas {
 
   drawOpenBegin_straight(x1, y1, kMinWidthT, kagekMinWidthY, dir) {
     const rad_offset = Math.atan(kagekMinWidthY*0.5/kMinWidthT);
+    //const rad_offset = (0.1*Math.PI);
     var poly = new Polygon();
     let p1 = new PointMaker(x1, y1, dir);
     let[x, y] = p1.vec(kagekMinWidthY*0.5, -kMinWidthT);
     const offs_sin = Math.sin(rad_offset);
     const offs_cos = Math.cos(rad_offset);
+    //let[x, y] = p1.vec(kMinWidthT*offs_sin/offs_cos, -kMinWidthT);
     const new_dir = {sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin};
     let p2 = new PointMaker(x, y, new_dir, kMinWidthT);
     poly.push2(p2.vec(0, 0));

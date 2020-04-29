@@ -57,10 +57,10 @@ class Bezier{
       tang1.push(rad_to_vector(rad-width_rad));
       tang2.push(rad_to_vector(rad+width_rad-Math.PI));
     }
-    //const bez1 = fitCubic_tang(a1, tang1, 0.001);
-    //const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.001);
-    const bez1 = fitCurve(a1, 0.03);
-    const bez2 = fitCurve(a2.reverse(), 0.03);
+    const bez1 = fitCubic_tang(a1, tang1, 0.03);
+    const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
+    //const bez1 = fitCurve(a1, 0.03);
+    //const bez2 = fitCurve(a2.reverse(), 0.03);
     return [bez1, bez2];
   }
 

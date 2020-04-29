@@ -126,7 +126,13 @@ class Mincho {
     const y3 = s[8];
     const x4 = s[9];
     const y4 = s[10];
-
+    if(a2>100){
+      console.log("error: start type"+a2)
+    }
+    if(a3>100){
+      console.log("error: end type"+a3)
+    }
+    
     const dir12 = get_dir(x2-x1, y2-y1);
     const dir23 = get_dir(x3-x2, y3-y2);
     const dir34 = get_dir(x4-x3, y4-y3);
@@ -222,6 +228,7 @@ class Mincho {
             }
             case ENDTYPE.CONNECTING_V: {
               if (y1 == y2) {//horizontal (error)
+                console.log("error: connecting_v at the end of the horizontal line")
                 cv.drawLine(x1, y1, x2, y2, kMinWidthT_m);
               } else if (x1 == x2) {//vertical
                 poly_end.set(0, x2 + kMinWidthT_m, y2 + this.kMinWidthY - 0.001);
@@ -241,6 +248,7 @@ class Mincho {
                 cv.drawLowerRightHT(x2, y2, kMinWidthT_m, this.kMinWidthY);
               }
               if (y1 == y2) {//horizontal (error)
+                console.log("error: connecting_v at the end of the horizontal line")
                 cv.drawLine(x1, y1, x2, y2, kMinWidthT_m);
               } else if (x1 == x2) {//vertical
                 poly_end.set(0, x2 + kMinWidthT_m, y2 + this.kMinWidthY);
@@ -254,7 +262,7 @@ class Mincho {
               break;
             }
             default:
-              throw ("unknown end type at the straight line");
+              throw ("error: unknown end type at the straight line");
               break;
           }
           //body
@@ -376,7 +384,7 @@ class Mincho {
         break;
       }
       case 12: {
-        throw "unknown stroketype 12";
+        throw "error: unknown stroketype 12";
         break;
       }
       case STROKETYPE.BENDING_ROUND: {
@@ -504,7 +512,7 @@ class Mincho {
         //kageCanvas[y2][x2] = 0;
         break;
       default:
-        throw "unknown stroke"+s;
+        throw "error: unknown stroke "+s;
         break;
     }
   }
@@ -728,6 +736,7 @@ class Mincho {
       const v = (x1 > x2) ? -1 : 1;
       if (a1 == 22) {
         if (dir.sin==0) {//error
+          console.log("error: connecting_v at the end of the horizontal line")
           poly_start = this.getStartOfLine(x1, y1, dir, kMinWidthT);
         } else {
           poly_start.set(1, x1 + (kMinWidthT * v + 1) / Math.sin(rad), y1 + 1);//??
@@ -735,6 +744,7 @@ class Mincho {
         }
       } else if (a1 == 32) {
         if (dir.sin==0) {//error
+          console.log("error: connecting_v at the end of the horizontal line")
           poly_start = this.getStartOfLine(x1, y1, dir, kMinWidthT);
         } else {
           poly_start.set(1, x1 + (kMinWidthT * v) / Math.sin(rad), y1);
@@ -828,6 +838,7 @@ class Mincho {
     res = Math.min(res, this.kAdjustTateStep);
     return res;//a2 += res * 1000
   }
+
   adjustUrokoParam(stroke, others) { // strokes
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN
     for (var k = 0; k < this.kAdjustUrokoLengthStep; k++) {
@@ -851,6 +862,7 @@ class Mincho {
     }
     return 0;//a3 += res * 100;
   }
+
   adjustUroko2Param(stroke, others) { // strokes
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN && y1==y2
     var pressure = 0;
@@ -890,6 +902,7 @@ class Mincho {
     }
     return res;//a3 += res * 100;
   }
+
   adjustMageParam(stroke, others) {
     //STROKETYPE.BENDING
     //applied only if y2=y3
@@ -910,6 +923,7 @@ class Mincho {
     res = Math.min(res, this.kAdjustMageStep);
     return res;//a3 += res * 1000;
   }
+
   adjustKirikuchiParam(stroke, others) { // connecting to other strokes.
     //STROKETYPE.CURVE, STARTTYPE.CONNECTING_V
     if (stroke[3] > stroke[5] &&
@@ -925,6 +939,7 @@ class Mincho {
     return false;
     //if (res) a2 += 100;
   }
+  
   adjustKakatoParam(stroke, others) {
     //if (STROKETYPE.STRAIGHT && (LOWER_LEFT_CORNER || LOWER_RIGHT_CORNER))
     for (var k = 0; k < this.kAdjustKakatoStep; k++) {

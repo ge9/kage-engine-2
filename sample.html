@@ -19,7 +19,7 @@
 function draw() {
  var canvas = document.getElementById("canvas");
  var ctx = canvas.getContext("2d");
- var kage = new Kage(FONTTYPE.MINCHO, 1.9);
+ var kage = new Kage(FONTTYPE.MINCHO);
  function getSVG(data){
   var polygons = new Polygons();
   kage.makeGlyph(polygons, data);
