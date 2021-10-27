@@ -144,7 +144,6 @@ export function get_rad(x, y) {
     } else {
       rad = -Math.PI / 2;
     }
-    v = 1;
   } else {
     rad = Math.atan(y / x);
     if (x < 0) { rad += Math.PI }
