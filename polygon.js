@@ -33,8 +33,8 @@ class Polygon{
   }
   to_font1000(){
     for(var j = 0; j < this.array.length; j++){
-      this.array[i].x = this.array[i].x*5;
-      this.array[i].y = this.array[i].y*-5 - 200;
+      this.array[j].x = this.array[j].x*5;
+      this.array[j].y = this.array[j].y*-5 - 200;
     }
   }
   reverse(){ // void

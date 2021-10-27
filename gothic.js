@@ -121,10 +121,10 @@ class Gothic{
       x1 = x1ext; y1 = y1ext;
     }
     if (a2 % 10 == 2) {
-      let [x2ext, y2ext] = get_extended_dest_wrong(x3, y3, sx2, sy2, this.kWidth);
+      let [x2ext, y2ext] = get_extended_dest_wrong(x3, y3, x2, y2, this.kWidth);
       x3 = x2ext; y3 = y2ext;
     } else if (a2 % 10 == 3) {
-      let [x2ext, y2ext] = get_extended_dest_wrong(x3, y3, sx2, sy2, this.kWidth * this.kKakato);
+      let [x2ext, y2ext] = get_extended_dest_wrong(x3, y3, x2, y2, this.kWidth * this.kKakato);
       x3 = x2ext; y3 = y2ext;
     }
     cv.drawQBezier(x1, y1, x2, y2, x3, y3, (t) => { return this.kWidth; }, t => 0, 1000 / this.kRate);
