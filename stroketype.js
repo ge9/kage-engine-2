@@ -1,4 +1,4 @@
-var STROKETYPE = {
+export const STROKETYPE = {
     STRAIGHT : 1,//直線
     CURVE : 2,//曲線 quadratic bezier curve
     BENDING : 3,//折れ used in "札" "己"
@@ -8,7 +8,7 @@ var STROKETYPE = {
                //although the angle of line can be chosen arbitrarily, only vertical line is expected.
     REFERENCE : 99,
 }
-var STARTTYPE = {
+export const STARTTYPE = {
     OPEN : 0,//simple lines like "三" or "川" (two strokes on the right side)
              //also used in the left stroke of "人"
     CONNECTING_H : 2,//horizontal strokes connecting to other strokes.  used in the center strokes of "日".
@@ -17,7 +17,7 @@ var STARTTYPE = {
     CONNECTING_V : 32,//vertical strokes connecting to other strokes.  used in the center strokes of "工".
     THIN : 7//used in the right stroke of "人"
 }
-var ENDTYPE = {
+export const ENDTYPE = {
     OPEN : 0,//simple lines like "三" or "川" (two strokes on the right side)
              //also used in the right stroke of "人"(L2R sweep)
     CONNECTING_H : 2,

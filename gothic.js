@@ -1,4 +1,7 @@
-class Gothic{
+import { FontCanvas } from "./fontcanvas";
+import {get_extended_dest, get_extended_dest_wrong} from "./util";
+
+export class Gothic{
   constructor(size) {
     this.kRate = 50;
     if (size == 1) {

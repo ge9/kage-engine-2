@@ -1,9 +1,14 @@
-var FONTTYPE = {
+import { Buhin } from "./buhin";
+import { Gothic } from "./gothic";
+import { Mincho } from "./mincho";
+import { STROKETYPE } from "./stroketype";
+import {getBoundingBox, stretch} from "./util";
+export const FONTTYPE = {
   MINCHO: 0,
   GOTHIC: 1,
 }
 
-class Kage {
+export class Kage {
   constructor(type, size){
     this.kBuhin = new Buhin();
     this.setFont(type,size);

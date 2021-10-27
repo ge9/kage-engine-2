@@ -21,7 +21,7 @@
  * @param {Number} maxError - Tolerance, squared error between points and fitted curve
  * @returns {Array<Array<Array<Number>>>} Array of Bezier curves, where each element is [first-point, control-point-1, control-point-2, second-point] and points are [x, y]
  */
-function fitCurve(points, maxError, progressCallback) {
+export function fitCurve(points, maxError, progressCallback) {
     if (!Array.isArray(points)) {
         throw new TypeError("First argument should be an array");
     }
@@ -59,7 +59,7 @@ function fitCurve(points, maxError, progressCallback) {
  * @returns {Array<Array<Array<Number>>>} Array of Bezier curves, where each element is [first-point, control-point-1, control-point-2, second-point] and points are [x, y]
  */
 
-function fitCubic_tang(points, tangents, error, progressCallback) {
+export function fitCubic_tang(points, tangents, error, progressCallback) {
     const MaxIterations = 20;   //Max times to try iterating (to find an acceptable curve)
 
     var bezCurve,               //Control points of fitted Bezier curve

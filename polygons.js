@@ -1,4 +1,4 @@
-class Polygons{
+export class Polygons{
   // method
   constructor(){
     this.array = new Array();

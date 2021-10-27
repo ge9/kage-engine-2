@@ -1,4 +1,4 @@
-class Polygon{
+export class Polygon{
   // resolution : 0.0001
   constructor(number){
     this.array = new Array();

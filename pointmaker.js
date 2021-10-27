@@ -1,4 +1,5 @@
-class PointMaker{
+import {DIR_POSX} from "./util";
+export class PointMaker{
   constructor(x, y, dir, scale){
     this.x = x;
     this.y = y;

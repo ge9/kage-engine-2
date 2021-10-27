@@ -1,4 +1,9 @@
-class FontCanvas {
+import { Polygons } from "./polygons";
+import { Polygon } from "./polygon";
+import { PointMaker } from "./pointmaker";
+import { Bezier} from "./bezier";
+import {vector_to_len, bez_cir, get_dir, DIR_POSY} from "./util";
+export class FontCanvas {
   constructor() {
     this.polygons = new Polygons();
   }

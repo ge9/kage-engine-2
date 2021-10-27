@@ -1,45 +1,45 @@
-const bez_cir = 4*(Math.sqrt(2)-1)/3;
+export const bez_cir = 4*(Math.sqrt(2)-1)/3;
 //a constant for drawing circles with Bezier curves
 
 //width functions (using circle)
-function widfun(t, x1, y1, x2, y2, wid){
+export function widfun(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
   return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.778+0.222  )*wid;
 }
 
-function widfun_d(t, x1, y1, x2, y2, wid){
+export function widfun_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
   return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
 }
 
-function widfun_stop(t, x1, y1, x2, y2, wid){
+export function widfun_stop(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
   return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.878+0.222  )*wid;
 }
 
-function widfun_stop_d(t, x1, y1, x2, y2, wid){
+export function widfun_stop_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
   return wid*0.878*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
 }
 
 //fat version (used in cubic bezier)
-function widfun_fat(t, x1, y1, x2, y2, wid){
+export function widfun_fat(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1+ (40/len);
-  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.778+0.222  )*wid;
+  return (  (Math.sqrt(p*p + (p-1)*(p-1) - (p-t)*(p-t)) - (p-1)  )*0.778+0.222  )*wid;
 }
 
-function widfun_fat_d(t, x1, y1, x2, y2, wid){
+export function widfun_fat_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1+ (40/len);
-  return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+  return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p + (p-1)*(p-1) - (p-t)*(p-t));
 }
 
-function get_dir(x, y){
+export function get_dir(x, y){
   if (y==0){
     if(x<0){
       return {sin: 0, cos: -1};
@@ -57,20 +57,20 @@ function get_dir(x, y){
     return {sin:  Math.sin(rad), cos: Math.cos(rad)};
   }
 }
-const DIR_POSX = {sin: 0, cos: 1};
-const DIR_POSY = {sin: 1, cos: 0};
-const DIR_NEGX = {sin: 0, cos: -1};
-const DIR_NEGY = {sin: -1, cos: 0};
+export const DIR_POSX = {sin: 0, cos: 1};
+export const DIR_POSY = {sin: 1, cos: 0};
+export const DIR_NEGX = {sin: 0, cos: -1};
+export const DIR_NEGY = {sin: -1, cos: 0};
 
-function moved_point(x, y, dir, delta){
+export function moved_point(x, y, dir, delta){
   return [x + delta*dir.cos, y + delta*dir.sin];
 }
-function get_extended_dest(destX, destY, srcX, srcY, delta) {
+export function get_extended_dest(destX, destY, srcX, srcY, delta) {
   const dir = get_dir(destX - srcX, destY - srcY);
   return moved_point(destX, destY, dir, delta);
 }
 
-function get_extended_dest_wrong(destX, destY, srcX, srcY, delta) {
+export function get_extended_dest_wrong(destX, destY, srcX, srcY, delta) {
   //The process for lines directed exactly in the negative x-direction or y-direction is not correct, so it's named as "wrong".
   var destX_new = destX;
   var destY_new = destY;
@@ -82,7 +82,7 @@ function get_extended_dest_wrong(destX, destY, srcX, srcY, delta) {
   }
   else {
     var v;
-    rad = Math.atan((destY - srcY) / (destX - srcX));
+    const rad = Math.atan((destY - srcY) / (destX - srcX));
     if (srcX < destX) { v = 1; } else { v = -1; }
     destX_new = destX + delta * Math.cos(rad) * v;
     destY_new = destY + delta * Math.sin(rad) * v;
@@ -90,7 +90,7 @@ function get_extended_dest_wrong(destX, destY, srcX, srcY, delta) {
   return [destX_new, destY_new]
 }
 
-function unit_normal_vector(ix, iy) {//to the right(clockwise (in the display coordinate))
+export function unit_normal_vector(ix, iy) {//to the right(clockwise (in the display coordinate))
   var ia, ib;
   // line SUICHOKU by vector
   if (ix != 0 && iy != 0) {
@@ -123,7 +123,7 @@ function normal_vector_of_len(v, l){//to the right(clockwise (in the display coo
   return [-v[1]*l/len,v[0]*l/len];
 }
 
-function vector_to_len(v, l){
+export function vector_to_len(v, l){
   const len=Math.sqrt(v[0]*v[0]+v[1]*v[1]);
   return [v[0]*l/len,v[1]*l/len];
 }
@@ -136,7 +136,7 @@ function calc_hosomi(x1, y1, x2, y2) {
   return hosomi;
 }
 
-function get_rad(x, y) {
+export function get_rad(x, y) {
   var rad;
   if (x == 0) {
     if (y > 0) {
@@ -152,7 +152,7 @@ function get_rad(x, y) {
   return rad;
 }
 
-function rad_to_vector(rad) {
+export function rad_to_vector(rad) {
   return [Math.cos(rad), Math.sin(rad)];
 }
 
@@ -167,7 +167,7 @@ function stretch_bezier_end(bez, t){
                (1-t) * (1-t) * (1-t) * bez[0][1] + 3 * t * (1-t) * (1-t) * bez[1][1] + 3 * t * t * (1-t) * bez[2][1] + t * t * t * bez[3][1],]
   return [start, c1, c2, end];
 }
-function bezier_to_y(bez, y){
+export function bezier_to_y(bez, y){
   const res = shorten_bezier_to_y(bez, y);
   if(res){return res;}else{
     return extend_bezier_to_y(bez, y);
@@ -260,7 +260,7 @@ function cuberoot(x) {
   return x < 0 ? -y : y;
 }
 
-function stretch(dp, sp, p, min, max) { // integer
+export function stretch(dp, sp, p, min, max) { // integer
   var p1, p2, p3, p4;
   if (p < sp + 100) {
     p1 = min;
@@ -276,7 +276,7 @@ function stretch(dp, sp, p, min, max) { // integer
   return Math.floor(((p - p1) / (p2 - p1)) * (p4 - p3) + p3);
 }
 
-function getBoundingBox(strokes) { // minX, minY, maxX, maxY
+export function getBoundingBox(strokes) { // minX, minY, maxX, maxY
   var a = new Object();
   a.minX = 200;
   a.minY = 200;
