@@ -282,7 +282,7 @@ export class Mincho {
               break;
             }
             default:
-              throw ("error: unknown end type at the straight line");
+              throw ("error: unknown end type at the straight line: "+a1);
               break;
           }
           //body
@@ -305,14 +305,14 @@ export class Mincho {
             cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
           }
         } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER) {
-          cv.drawUpperRightCorner(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth);
+          cv.drawUpperRightCorner2(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth);
         } else if (a2 == STARTTYPE.UPPER_LEFT_CORNER) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, -this.kMinWidthY);
           cv.drawUpperLeftCorner(x1ext, y1ext, dir12, this.kMinWidthT);
         }
         //body
         const a2temp = (a2 == STARTTYPE.CONNECTING_V && this.adjustKirikuchiParam(s, others)) ? 100 + a2 : a2;
-        let [tan1, tan2] = this.minchoDrawCurve(x1, y1, x2, y2, x3, y3, a2temp, a3, cv);
+        this.minchoDrawCurve(x1, y1, x2, y2, x3, y3, a2temp, a3, cv);
         //tail
         switch (a3) {
           case ENDTYPE.TURN_LEFT: {
@@ -329,8 +329,8 @@ export class Mincho {
             break;
           }
           case ENDTYPE.STOP: {
-            let [x3ex, y3ex] = moved_point(x3, y3, dir23, -1 * this.kMinWidthT * 0.52);
-            cv.drawTailCircle_tan(x3ex, y3ex, dir23, this.kMinWidthT*1.1, tan1, tan2);
+            //let [x3ex, y3ex] = moved_point(x3, y3, dir23, -1 * this.kMinWidthT * 0.52);
+            //cv.drawTailCircle_tan(x3ex, y3ex, dir23, this.kMinWidthT*1.1, tan1, tan2);
             break;
           }
           default: {
@@ -532,7 +532,7 @@ export class Mincho {
         //kageCanvas[y2][x2] = 0;
         break;
       default:
-        throw "error: unknown stroke "+s;
+        throw "error: unknown stroke: "+s;
         break;
     }
   }
@@ -570,12 +570,14 @@ export class Mincho {
     var width_func;
     var width_func_d;
     let bez1, bez2;
-    
+    let thin_stop_param;
     if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.STOP) { //stop
       //const slant_cos = 
-      width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT);
-      width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT);
-
+      const len=Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+      thin_stop_param = (1 + (len-45)*0.002);
+      
+      width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT)*thin_stop_param;
+      width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT)*thin_stop_param;
       [bez1, bez2] = Bezier.qBezier2(x1, y1, sx, sy, x2, y2, width_func, width_func_d);
     }
     else {
@@ -607,25 +609,39 @@ export class Mincho {
       var temp = bez1[0].concat();//deep copy
       let b2 = bezier_to_y(temp.reverse(), y1);
       if (b2) { bez1[0] = b2.reverse(); }
-    } else if (a1 == 22 && x1 != sx && y1 > y2) {
+    } else if (a1 == 22 && x1 != sx) {
+      let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
+      if (b1) { bez2[bez2.length - 1] = b1; }
+    
+    /*} else if (a1 == 22 && x1 != sx && y1 > y2) {
       let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
       if (b1) { bez2[bez2.length - 1] = b1; }
       var temp = bez1[0].concat();//deep copy
       let b2 = bezier_to_y(temp.reverse(), y1 + 1);//??
       if (b2) { bez1[0] = b2.reverse(); }
+      */
     }
     var poly = Bezier.bez_to_poly(bez1);
     poly.concat(Bezier.bez_to_poly(bez2));
+    if(a1==22){
+      poly.push(x1, y1);
+    }
     cv.addPolygon(poly);
 
-    const bez1e = bez1[bez1.length - 1][3];
-    const bez1c2 = bez1[bez1.length - 1][2];
-
-    const bez2s = bez2[0][0];
-    const bez2c1 = bez2[0][1];
-    const tan1 = [bez1e[0] - bez1c2[0], bez1e[1] - bez1c2[1]];
-    const tan2 = [bez2s[0] - bez2c1[0], bez2s[1] - bez2c1[1]];
-    return [tan1, tan2];
+    if(a2 == ENDTYPE.STOP){
+      const enddir = get_dir(x2-sx, y2-sy);
+      if(a1 == STARTTYPE.THIN){
+        const bez1e = bez1[bez1.length - 1][3];
+      const bez1c2 = bez1[bez1.length - 1][2];
+      const bez2s = bez2[0][0];
+      const bez2c1 = bez2[0][1];
+      const tan1 = [bez1e[0] - bez1c2[0], bez1e[1] - bez1c2[1]];
+      const tan2 = [bez2s[0] - bez2c1[0], bez2s[1] - bez2c1[1]];
+       cv.drawTailCircle_tan(x2, y2, enddir, this.kMinWidthT*1.1*thin_stop_param, tan1, tan2);
+      }else{
+        cv.drawTailCircle(x2, y2, enddir, this.kMinWidthT);
+      }
+    }
   }
 
   minchoDrawBezier(x1pre, y1pre, sx1, sy1, sx2, sy2, x2pre, y2pre, a1, a2, cv) {
@@ -663,7 +679,7 @@ export class Mincho {
     let bez1, bez2;
     
     if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.STOP) { //stop
-            width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT);
+      width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT);
       width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT);
 
       [bez1, bez2] = Bezier.cBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d);
@@ -701,7 +717,7 @@ export class Mincho {
       let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
       if (b1) { bez2[bez2.length - 1] = b1; }
       var temp = bez1[0];
-      let b2 = bezier_to_y(temp.reverse(), y1 + 1);
+      let b2 = bezier_to_y(temp.reverse(), y1 + 1);//" + 1" ??
       if (b2) { bez1[0] = b2.reverse(); }
     }
     var poly = Bezier.bez_to_poly(bez1);
@@ -759,7 +775,8 @@ export class Mincho {
           console.log("error: connecting_v at the end of the horizontal line")
           poly_start = this.getStartOfLine(x1, y1, dir, kMinWidthT);
         } else {
-          poly_start.set(1, x1 + (kMinWidthT * v + 1) / Math.sin(rad), y1 + 1);//??
+          //poly_start.set(1, x1 + (kMinWidthT * v + 1) / Math.sin(rad), y1 + 1);//" + 1" ??
+          poly_start.set(1, x1 + (kMinWidthT * v) / Math.sin(rad), y1);
           poly_start.set(0, x1 - (kMinWidthT * v) / Math.sin(rad), y1);
         }
       } else if (a1 == 32) {

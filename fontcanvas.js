@@ -136,7 +136,25 @@ export class FontCanvas {
     poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
     poly.push2(p.vec(kMinWidthT,kMinWidthT*0.8), 2);
     poly.push2(p.vec(0,kMinWidthT*1.2), 2);
-    poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
+    poly.push2(p.vec(-kMinWidthT*0.9,kMinWidthT*1.2));
+    //poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
+    this.polygons.push(poly);
+  }
+
+  drawUpperRightCorner2(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth) {
+    var p = new PointMaker(x1, y1);
+    var poly = new Polygon();
+    poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
+    poly.push2(p.vec(-kMinWidthT*1.1,-kagekMinWidthY));
+
+    poly.push2(p.vec(0,-kagekMinWidthY - kagekWidth));
+    //poly.push2(p.vec(-kMinWidthT*0.1,-kagekMinWidthY - kagekWidth*1.1));
+    
+    poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
+    poly.push2(p.vec(kMinWidthT,kMinWidthT*0.8), 2);
+    poly.push2(p.vec(0,kMinWidthT*1.2), 2);
+    poly.push2(p.vec(-kMinWidthT*0.9,kMinWidthT*1.2));
+    //poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
     this.polygons.push(poly);
   }
   
@@ -161,7 +179,7 @@ export class FontCanvas {
     const offs_cos = Math.cos(rad_offset);
     //let[x, y] = p1.vec(kMinWidthT*offs_sin/offs_cos, -kMinWidthT);
     const new_dir = {sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin};
-    let p2 = new PointMaker(x, y, new_dir, kMinWidthT);
+    let p2 = new PointMaker(x, y, new_dir, kMinWidthT*0.876);
     poly.push2(p2.vec(0, 0));
     poly.push2(p2.vec(0, -1.4), 2);
     poly.push2(p2.vec(0.6, -1.4), 2);
@@ -177,7 +195,7 @@ export class FontCanvas {
     let p2 = new PointMaker();
     const offs_sin = Math.sin(rad_offset);
     const offs_cos = Math.cos(rad_offset);
-    p2.setscale(kMinWidthT);
+    p2.setscale(kMinWidthT*0.876);
     p2.setdir({sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin});
     if(rad_offset>0){
       poly.push2(p1.vec(-(offs_sin/offs_cos)*2*kMinWidthT, kMinWidthT));
@@ -218,7 +236,7 @@ export class FontCanvas {
     poly.push2(p1.vec((offs_sin/offs_cos)*2*kMinWidthT, -kMinWidthT));
 
     let p2 = new PointMaker();
-    p2.setscale(kMinWidthT);
+    p2.setscale(kMinWidthT*0.876);
     p2.setdir({sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin});
     let[x, y] = p1.vec(0, kMinWidthT);
     p2.setpos(x, y);
