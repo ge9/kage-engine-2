@@ -348,9 +348,9 @@ export class Mincho {
       case STROKETYPE.BENDING: {
         //first line
         const param_tate = this.adjustTateParam(s, others);
-        const param_mage = this.adjustMageParam(s, others) / 2;
+        const param_mage = this.adjustMageParam(s, others);
         const kMinWidthT_m = this.kMinWidthT - param_tate / 2;
-        const kMinWidthT_mage = (this.kMinWidthT - param_mage / 2)*0.9;
+        const kMinWidthT_mage = this.kMinWidthT - param_mage / 2;
         let [tx1, ty1] = moved_point(x2, y2, dir12, -this.kMage);
         let [tx2, ty2] = moved_point(x2, y2, dir23, this.kMage);
         {
