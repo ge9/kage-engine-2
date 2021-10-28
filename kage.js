@@ -42,6 +42,18 @@ export class Kage {
     var kageStrokes = this.getStrokes(data);
     return this.kFont.getPolygons(kageStrokes);
   }
+
+  makeGlyphSeparated2(data) {
+		const strokesArrays = data.map((subdata) => this.getStrokes(subdata));
+		return strokesArrays.map((strokesArray) => {
+			const result = this.kFont.getPolygons(strokesArray)
+			return result;
+		});
+  }
+  makeGlyphSeparated(data) {
+    const strokesArrays = data.map((subdata) => this.getStrokes(subdata));
+    return this.kFont.getPolygonsSeparated(strokesArrays);
+	}
   getStrokes(glyphData) { // strokes array
     var strokes = new Array();
     var textData = glyphData.split("$");
@@ -121,5 +133,15 @@ export class Kage {
     }
     return result;
   }
- 
+
+  //for compatibility
+  getEachStrokes(glyphData) {
+    return this.getStrokes(glyphData);
+  }
+  getBox(strokes){
+    return getBoundingBox(strokes);
+  }
+  stretch(dp, sp, p, min, max){
+    return stretch(dp, sp, p, min, max);
+  }
 }

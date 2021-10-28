@@ -119,7 +119,21 @@ export class Mincho {
     }
     return cv.getPolygons();
   }
-
+  getPolygonsSeparated(strokesArrays) {
+    return strokesArrays.map((glyphData, index) => {
+      const cp = strokesArrays.slice();
+      cp.splice(index,1)
+      const other_groups = cp.flat();
+     
+      var cv = new FontCanvas();
+      for (var i = 0; i < glyphData.length; i++) {
+        var tempdata = glyphData.slice();
+        tempdata.splice(i, 1);
+        this.drawAdjustedStroke(cv, glyphData[i], other_groups.concat(tempdata));
+      }
+      return cv.getPolygons();
+    });
+  }
   drawAdjustedStroke(cv, s, others) {//draw stroke on the canvas
     const a1 = s[0];
     const a2 = s[1];
