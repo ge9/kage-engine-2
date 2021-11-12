@@ -1,6 +1,6 @@
-import {unit_normal_vector, rad_to_vector, get_rad} from "./util";
-import {Polygon} from "./polygon";
-import {fitCubic_tang, fitCurve} from "./fit-curve";
+import {unit_normal_vector, rad_to_vector, get_rad} from "./util.js";
+import {Polygon} from "./polygon.js";
+import {fitCubic_tang, fitCurve} from "./fit-curve.js";
 const bezier_steps = 200;
 export class Bezier{
   static generalBezier(x_fun, y_fun, dx_fun, dy_fun, width_func, width_func_d){

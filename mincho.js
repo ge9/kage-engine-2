@@ -1,9 +1,9 @@
-import { FontCanvas } from "./fontcanvas";
-import { get_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util";
-import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype";
-import { Bezier} from "./bezier";
-import { Polygon } from "./polygon";
-import {isCrossBoxWithOthers,isCrossWithOthers} from "./2d";
+import { FontCanvas } from "./fontcanvas.js";
+import { get_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util.js";
+import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype.js";
+import { Bezier} from "./bezier.js";
+import { Polygon } from "./polygon.js";
+import {isCrossBoxWithOthers,isCrossWithOthers} from "./2d.js";
 export class Mincho {
   constructor(size) {
     this.kRate = 50;

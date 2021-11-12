@@ -1,5 +1,5 @@
-import { FontCanvas } from "./fontcanvas";
-import {get_extended_dest, get_extended_dest_wrong} from "./util";
+import { FontCanvas } from "./fontcanvas.js";
+import {get_extended_dest, get_extended_dest_wrong} from "./util.js";
 
 export class Gothic{
   constructor(size) {

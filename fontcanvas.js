@@ -1,8 +1,8 @@
-import { Polygons } from "./polygons";
-import { Polygon } from "./polygon";
-import { PointMaker } from "./pointmaker";
-import { Bezier} from "./bezier";
-import {vector_to_len, bez_cir, get_dir, DIR_POSY} from "./util";
+import { Polygons } from "./polygons.js";
+import { Polygon } from "./polygon.js";
+import { PointMaker } from "./pointmaker.js";
+import { Bezier} from "./bezier.js";
+import {vector_to_len, bez_cir, get_dir, DIR_POSY} from "./util.js";
 export class FontCanvas {
   constructor() {
     this.polygons = new Polygons();
@@ -361,13 +361,15 @@ export class FontCanvas {
     var poly = new Polygon();
     var p = new PointMaker(x2, y2, dir);
     poly.push2(p.vec(kMinWidthT*0.7,  - kMinWidthT*0.7));
-    poly.push2(p.vec(0, - kMinWidthT),2);
-    poly.push2(p.vec(kMinWidthT*0.3, - kMinWidthT - length_param/2), 2);
-    poly.push2(p.vec(kMinWidthT*0.5, - kMinWidthT - length_param));
+    poly.push2(p.vec(kMinWidthT*0.22, - kMinWidthT),2);
+    poly.push2(p.vec(kMinWidthT*0.167, - kMinWidthT - length_param*0.05),2);
+    poly.push2(p.vec(kMinWidthT*0.181, - kMinWidthT - length_param*0.15));
+    poly.push2(p.vec(kMinWidthT*0.3, - kMinWidthT - length_param));
     poly.push2(p.vec(0,  - kMinWidthT - length_param));
-    poly.push2(p.vec( - kMinWidthT*0.6, - kMinWidthT - length_param/4), 2);
-    poly.push2(p.vec( - kMinWidthT*1.8, - kMinWidthT), 2);
-    poly.push2(p.vec( - kMinWidthT*2.2, - kMinWidthT));
+    poly.push2(p.vec( - kMinWidthT*0.75, - kMinWidthT - length_param/4));
+    poly.push2(p.vec( - kMinWidthT*0.875, - kMinWidthT - length_param/8), 2);
+    poly.push2(p.vec( - kMinWidthT*1.25, - kMinWidthT), 2);
+    poly.push2(p.vec( - kMinWidthT*1.6, - kMinWidthT));
     
     poly.reverse(); // for fill-rule
     this.polygons.push(poly);

@@ -1,4 +1,4 @@
-import {DIR_POSX} from "./util";
+import {DIR_POSX} from "./util.js";
 export class PointMaker{
   constructor(x, y, dir, scale){
     this.x = x;
