@@ -1,42 +1,42 @@
 export const bez_cir = 4*(Math.sqrt(2)-1)/3;
 //a constant for drawing circles with Bezier curves
-
+const CURVE_THIN = 0.222
 //width functions (using circle)
 export function widfun(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
-  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.778+0.222  )*wid;
+  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*(1-CURVE_THIN)+CURVE_THIN  )*wid;
 }
 
 export function widfun_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
-  return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+  return wid*(1-CURVE_THIN)*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
 }
 
 export function widfun_stop(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
-  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*0.878+0.222  )*wid;
+  return (  (Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t))-(p-1))*(1.10-CURVE_THIN)+CURVE_THIN  )*wid;
 }
 
 export function widfun_stop_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + (100/len);
-  return wid*0.878*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+  return wid*(1.10-CURVE_THIN)*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
 }
 
 //fat version (used in cubic bezier)
 export function widfun_fat(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1+ (40/len);
-  return (  (Math.sqrt(p*p + (p-1)*(p-1) - (p-t)*(p-t)) - (p-1)  )*0.778+0.222  )*wid;
+  return (  (Math.sqrt(p*p + (p-1)*(p-1) - (p-t)*(p-t)) - (p-1)  )*(1-CURVE_THIN)+CURVE_THIN  )*wid;
 }
 
 export function widfun_fat_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1+ (40/len);
-  return wid*0.778*0.5*2*(p-t) / Math.sqrt(p*p + (p-1)*(p-1) - (p-t)*(p-t));
+  return wid*(1-CURVE_THIN)*0.5*2*(p-t) / Math.sqrt(p*p + (p-1)*(p-1) - (p-t)*(p-t));
 }
 
 export function get_dir(x, y){
