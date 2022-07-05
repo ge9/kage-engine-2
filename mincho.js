@@ -6,6 +6,7 @@ import { Polygon } from "./polygon.js";
 import {isCrossBoxWithOthers,isCrossWithOthers} from "./2d.js";
 export class Mincho {
   constructor(size) {
+    //if (!size) size=2.5;
     this.kRate = 50;
     if (size == 1) {
       this.kMinWidthY = 1.2;
@@ -630,7 +631,6 @@ export class Mincho {
     cv.addPolygon(poly);
 
     if(a2 == ENDTYPE.STOP){
-      const enddir = get_dir(x2-sx, y2-sy);
       if(a1 == STARTTYPE.THIN){
         const bez1e = bez1[bez1.length - 1][3];
       const bez1c2 = bez1[bez1.length - 1][2];
@@ -638,8 +638,12 @@ export class Mincho {
       const bez2c1 = bez2[0][1];
       const tan1 = [bez1e[0] - bez1c2[0], bez1e[1] - bez1c2[1]];
       const tan2 = [bez2s[0] - bez2c1[0], bez2s[1] - bez2c1[1]];
-       cv.drawTailCircle_tan(x2, y2, enddir, this.kMinWidthT*1.1*thin_stop_param, tan1, tan2);
+      const cent_x = (x1 + 2*sx + x2) / 4;
+      const cent_y = (y1 + 2*sy + y2) / 4;
+      var rad_end = get_dir(x2-cent_x, y2-cent_y);
+       cv.drawTailCircle_tan(x2, y2, rad_end, this.kMinWidthT*1.1*thin_stop_param, tan1, tan2);
       }else{
+        const enddir = get_dir(x2-sx, y2-sy);
         cv.drawTailCircle(x2, y2, enddir, this.kMinWidthT);
       }
     }
