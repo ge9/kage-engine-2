@@ -137,6 +137,7 @@ function calc_hosomi(x1, y1, x2, y2) {
 }
 
 export function get_rad(x, y) {
+  return Math.atan2(y,x);
   var rad;
   if (x == 0) {
     if (y > 0) {
@@ -153,6 +154,10 @@ export function get_rad(x, y) {
 
 export function rad_to_vector(rad) {
   return [Math.cos(rad), Math.sin(rad)];
+}
+
+export function rad_to_dir(rad) {
+  return {sin:  Math.sin(rad), cos: Math.cos(rad)};
 }
 
 function stretch_bezier_end(bez, t){

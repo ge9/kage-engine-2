@@ -1,5 +1,5 @@
 import { FontCanvas } from "./fontcanvas.js";
-import { get_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util.js";
+import { get_dir, get_rad, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util.js";
 import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype.js";
 import { Bezier} from "./bezier.js";
 import { Polygon } from "./polygon.js";
@@ -157,6 +157,7 @@ export class Mincho {
     const dir12 = get_dir(x2-x1, y2-y1);
     const dir23 = get_dir(x3-x2, y3-y2);
     const dir34 = get_dir(x4-x3, y4-y3);
+    const rad12 = get_rad(x2-x1, y2-y1);
     
     switch (a1) {
       case 0: {//rotate and flip
@@ -300,7 +301,7 @@ export class Mincho {
         if (a2 == STARTTYPE.OPEN) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, 1 * this.kMinWidthY * 0.5);
           if (y1ext <= y3) { //from up to bottom
-            cv.drawOpenBegin_curve_down(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
+            cv.drawOpenBegin_curve_down(x1ext, y1ext, rad12, this.kMinWidthT, this.kMinWidthY);
           }
           else { //from bottom to up
             cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
@@ -470,7 +471,7 @@ export class Mincho {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, 1 * this.kMinWidthY * 0.5);
 
           if (y1ext <= y4) { //from up to bottom
-            cv.drawOpenBegin_curve_down(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
+            cv.drawOpenBegin_curve_down(x1ext, y1ext, rad12, this.kMinWidthT, this.kMinWidthY);
           }
           else { //from bottom to up
             cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
@@ -740,14 +741,15 @@ export class Mincho {
   }
 
   getStartOfVLine(x1, y1, x2, y2, a1, kMinWidthT, cv) {
+    const rad = get_rad(x2 - x1, y2 - y1);
     const dir = get_dir(x2 - x1, y2 - y1);
     var poly_start = new Polygon(2);
     if (dir.cos==0) {//vertical
       var left1, right1;
       switch (a1) {
         case 0:
-          right1 = this.kMinWidthY / 2;
-          left1 = -this.kMinWidthY / 2;
+          right1 = -this.kMinWidthT * 0.5;
+          left1 =  -this.kMinWidthT * 1.0;
           break;
         case 12:
           right1 = this.kMinWidthY + kMinWidthT;
@@ -770,11 +772,10 @@ export class Mincho {
         cv.drawUpperRightCorner_straight_v(x1, y1, kMinWidthT, this.kMinWidthY, this.kWidth);
       }
       if (a1 == 0) { //beginning of the stroke
-        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthY, dir);
+        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthY, rad);
       }
     } else {
-      const rad = Math.atan((y2 - y1) / (x2 - x1));
-      const v = (x1 > x2) ? -1 : 1;
+      const v = 1 //previously (x1 > x2) ? -1 : 1;
       if (a1 == 22) {
         if (dir.sin==0) {//error
           console.log("error: connecting_v at the end of the horizontal line")
@@ -796,8 +797,8 @@ export class Mincho {
         var left1, right1;
         switch (a1) {
           case 0:
-            right1 = this.kMinWidthY * 0.5;
-            left1 = this.kMinWidthY * -0.5;
+            right1 = -this.kMinWidthT * 0.5;
+            left1 = -this.kMinWidthT * 1.0;
             break;
           case 12:
             right1 = this.kMinWidthY + kMinWidthT;
@@ -816,7 +817,7 @@ export class Mincho {
         cv.drawUpperRightCorner(x1, y1, kMinWidthT, this.kMinWidthY, this.kWidth);
       }
       if (a1 == 0) { //beginning of the stroke
-        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthY, dir);
+        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthY, rad);
       }
     }
     return poly_start;

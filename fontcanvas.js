@@ -2,7 +2,7 @@ import { Polygons } from "./polygons.js";
 import { Polygon } from "./polygon.js";
 import { PointMaker } from "./pointmaker.js";
 import { Bezier} from "./bezier.js";
-import {vector_to_len, bez_cir, get_dir, DIR_POSY} from "./util.js";
+import {vector_to_len, bez_cir, get_dir, DIR_POSY, rad_to_dir} from "./util.js";
 export class FontCanvas {
   constructor() {
     this.polygons = new Polygons();
@@ -169,62 +169,72 @@ export class FontCanvas {
     this.polygons.push(poly);
   }
 
-  drawOpenBegin_straight(x1, y1, kMinWidthT, kagekMinWidthY, dir) {
-    const rad_offset = Math.atan(kagekMinWidthY*0.5/kMinWidthT);
+  drawOpenBegin_straight(x1, y1, kMinWidthT, kagekMinWidthY, rad) {
+    const dir=rad_to_dir((rad+Math.PI*0.621)*0.5);
+    //const rad_offset = Math.atan(kagekMinWidthY*0.5/kMinWidthT);
     //const rad_offset = (0.1*Math.PI);
+    const rad_diff = (rad - Math.PI*0.621) * 0.5
     var poly = new Polygon();
+    let p0 = new PointMaker(x1, y1, rad_to_dir(rad), kMinWidthT)
+    poly.push2(p0.vec(0.5, 1));
+    poly.push2(p0.vec(Math.sin(rad_diff), 1));
     let p1 = new PointMaker(x1, y1, dir);
-    let[x, y] = p1.vec(kagekMinWidthY*0.5, -kMinWidthT);
-    const offs_sin = Math.sin(rad_offset);
-    const offs_cos = Math.cos(rad_offset);
+    let[x, y] = p1.vec(0, -kMinWidthT);
+    //const offs_sin = Math.sin(rad_offset);
+    //const offs_cos = Math.cos(rad_offset);
     //let[x, y] = p1.vec(kMinWidthT*offs_sin/offs_cos, -kMinWidthT);
-    const new_dir = {sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin};
-    let p2 = new PointMaker(x, y, new_dir, kMinWidthT*0.876);
-    poly.push2(p2.vec(0, 0));
+    //const new_dir = {sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin};
+    let p2 = new PointMaker(x, y, dir, kMinWidthT*0.876);
+     poly.push2(p2.vec(0, 0));
     poly.push2(p2.vec(0, -1.4), 2);
-    poly.push2(p2.vec(0.6, -1.4), 2);
-    poly.push2(p2.vec(2.0, 1.0));
+    poly.push2(p2.vec(0.8, -1.4), 2);
+    poly.push2(p2.vec(1.5, 0.5));
     this.polygons.push(poly);
   }
 
-  drawOpenBegin_curve_down2(x1, y1, dir, kMinWidthT, rad_offset){
+  drawOpenBegin_curve_down2(x1, y1, rad, kMinWidthT, rad_offset, kagekMinWidthY){
+    
     var poly = new Polygon();
+    const dir = rad_to_dir(rad)
     let p1 = new PointMaker(x1, y1, dir);
-    poly.push2(p1.vec(0, kMinWidthT));
+    let [xx, yy] = p1.vec(-kagekMinWidthY*0.79, 0)
+    let p0 = new PointMaker(xx, yy, dir, kMinWidthT);
+    let [x0, y0 ] = p1.vec(0, kMinWidthT);
+    poly.push(x0, y0);
 
     let p2 = new PointMaker();
-    const offs_sin = Math.sin(rad_offset);
-    const offs_cos = Math.cos(rad_offset);
     p2.setscale(kMinWidthT*0.876);
-    p2.setdir({sin: dir.sin*offs_cos+dir.cos*offs_sin, cos: dir.cos*offs_cos-dir.sin*offs_sin});
-    if(rad_offset>0){
-      poly.push2(p1.vec(-(offs_sin/offs_cos)*2*kMinWidthT, kMinWidthT));
-      let[x, y] = p1.vec(0, -kMinWidthT);
-      poly.push(x, y);
-      p2.setpos(x, y);
-      let[x2, y2] = p2.vec(0, -rad_offset);
-      p2.setpos(x2, y2);
-    }else{
-      let[x, y] = p1.vec(0+2*kMinWidthT*offs_sin, kMinWidthT-2*kMinWidthT*offs_cos);
+    const offset_limit = Math.atan2(kagekMinWidthY*0.79 , kMinWidthT)
+    rad_offset = Math.min(rad_offset, offset_limit)
+    p2.setdir(rad_to_dir(rad+rad_offset));
+    
+    if (rad_offset < -offset_limit){
+      let p3 = new PointMaker(x0, y0, rad_to_dir(rad));
+      let [x3, y3] = p3.vec(kMinWidthT * 2 * Math.sin(rad_offset), -kMinWidthT * 2)
+      p2.setpos(x3, y3);
+    }else
+    {
+      poly.push2(p0.vec(-Math.sin(rad_offset), 1));
+      let[x, y] = p0.vec(Math.sin(rad_offset), -1);
       p2.setpos(x, y);
     }
-
     poly.push2(p2.vec(0, 0));
-    poly.push2(p2.vec(0, -0.8), 2);
-    poly.push2(p2.vec(0.6, -0.8), 2);
+    poly.push2(p2.vec(0, -1.0), 2);
+    poly.push2(p2.vec(0.6, -1.0), 2);
     poly.push2(p2.vec(1.8, 1.0));
     this.polygons.push(poly);
   }
 
-  drawOpenBegin_curve_down(x1, y1, dir, kMinWidthT, kagekMinWidthY){
-    const rad = Math.atan2(Math.abs(dir.sin), Math.abs(dir.cos));
+  drawOpenBegin_curve_down(x1, y1, rad, kMinWidthT, kagekMinWidthY){
     var rad_offset;
+    /*
     if(rad > Math.PI * 0.2){//36 degrees
       rad_offset = (0.1*Math.PI)*(rad-Math.PI * 0.2)/(Math.PI*0.3);
     }else{
       rad_offset = (-0.25*Math.PI)*(Math.PI*0.2-rad)/(Math.PI*0.2);
-    }
-    this.drawOpenBegin_curve_down2(x1, y1, dir, kMinWidthT, rad_offset);
+    }*/
+    rad_offset = (Math.PI*0.621 - rad)*0.5
+    this.drawOpenBegin_curve_down2(x1, y1, rad, kMinWidthT, rad_offset, kagekMinWidthY);
   }
 
   drawOpenBegin_curve_up(x1, y1, dir, kMinWidthT, kagekMinWidthY) {
@@ -242,9 +252,9 @@ export class FontCanvas {
     p2.setpos(x, y);
 
     poly.push2(p2.vec(0, 0));
-    poly.push2(p2.vec(0, 0.8), 2);
-    poly.push2(p2.vec(0.6, 0.8), 2);
-    poly.push2(p2.vec(1.8, -1.0));
+    poly.push2(p2.vec(0, 1.1), 2);
+    poly.push2(p2.vec(0.7, 1.1), 2);
+    poly.push2(p2.vec(1.4, -0.5));
     poly.reverse();
     this.polygons.push(poly);
   }
