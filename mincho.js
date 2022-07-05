@@ -6,7 +6,7 @@ import { Polygon } from "./polygon.js";
 import {isCrossBoxWithOthers,isCrossWithOthers} from "./2d.js";
 export class Mincho {
   constructor(size) {
-    //if (!size) size=2.5;
+    //if (!size) size=2.1;
     this.kRate = 50;
     if (size == 1) {
       this.kMinWidthY = 1.2;
@@ -72,8 +72,8 @@ export class Mincho {
       this.kAdjustKakatoRangeY = ([size, size * 5 + 3, size * 9 + 5, size * 12 + 6]); // 3 steps of checking
       this.kAdjustKakatoStep = 3; // number of steps
 
-      this.kAdjustUrokoX = ([size * 8 + 4, size * 7 + 3.5, size * 6 + 3, size * 5 + 2.5]); // for UROKO adjustment 000,100,200,300
-      this.kAdjustUrokoY = ([size * 5 + 2, size * 4.8 + 1.5, size * 4.6 + 1, size * 4.4 + 0.5]); // for UROKO adjustment 000,100,200,300
+      this.kAdjustUrokoX = ([size * 9.5 + 4, size * 8 + 3.5, size * 6.5 + 3, size * 5 + 2.5]); // for UROKO adjustment 000,100,200,300
+      this.kAdjustUrokoY = ([size * 4.6 + 2, size * 4.4 + 1.5, size * 4.2 + 1, size * 4.0 + 0.5]); // for UROKO adjustment 000,100,200,300
       this.kAdjustUrokoLength = ([size * 7 + 7, size * 11 + 11, size * 15 + 15]); // length for checking
       this.kAdjustUrokoLengthStep = 3; // number of steps
       this.kAdjustUrokoLine = ([size * 7 + 7, size * 9 + 8, size * 11 + 9]); // check for crossing. corresponds to length
