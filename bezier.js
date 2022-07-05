@@ -80,11 +80,11 @@ export class Bezier{
     const y_fun = t => ((1.0 - t) * (1.0 - t) * y1 + 2.0 * t * (1.0 - t) * sy + t * t * y2);
     const dx_fun = t => (x1 - 2.0 * sx + x2) * 2.0 * t + (-2.0 * x1 + 2.0 * sx);
     const dy_fun = t => (y1 - 2.0 * sy + y2) * 2.0 * t + (-2.0 * y1 + 2.0 * sy);
-    const cent_x = (x1 + 2*sx + x2) / 4;
-    const cent_y = (y1 + 2*sy + y2) / 4;
+    const cent_x = (x1 + 4*sx + x2) / 6;
+    const cent_y = (y1 + 4*sy + y2) / 6;
     
     const rad_begin = Math.atan2(cent_y-y1, cent_x-x1);
-    var rad_end = Math.atan2(y2-cent_y, x2-cent_x);
+    var rad_end   =   Math.atan2(y2-cent_y, x2-cent_x);
     if(rad_end - rad_begin > Math.PI) {
       rad_end -= Math.PI*2;
     }else if(rad_begin - rad_end > Math.PI){
