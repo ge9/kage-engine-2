@@ -576,7 +576,7 @@ export class Mincho {
     if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.STOP) { //stop
       //const slant_cos = 
       const len=Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-      thin_stop_param = (1 + (len-45)*0.002);
+      thin_stop_param = (1 + (len-100)*0.0007);
       
       width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT)*thin_stop_param;
       width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT)*thin_stop_param;

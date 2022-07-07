@@ -1,7 +1,7 @@
 export const bez_cir = 4*(Math.sqrt(2)-1)/3;
 //a constant for drawing circles with Bezier curves
 const CURVE_THIN = 0.222
-//width functions (using the first quadrant of circle centered at (-p, -p) )
+//width functions (using the first quadrant of circle of radius p, centered at (1-p, 1-p) )
 export function widfun(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + Math.sqrt(100/len);
@@ -24,6 +24,17 @@ export function widfun_stop_d(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   const p = 1 + Math.sqrt(100/len);
   return wid*(1.10-CURVE_THIN)*0.5*2*(p-t) / Math.sqrt(p*p+(p-1)*(p-1)-(p-t)*(p-t));
+}
+export function widfun_stop2(t, x1, y1, x2, y2, wid){
+  const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  const p = 1 + Math.sqrt(100/len);
+  return (  (1-Math.pow(1-t, 1.21))*(1.10-CURVE_THIN)+CURVE_THIN  )*wid;
+}
+
+export function widfun_stop2_d(t, x1, y1, x2, y2, wid){
+  const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  const p = 1 + Math.sqrt(100/len);
+  return wid*(1.10-CURVE_THIN)*(1* 1.21) * Math.pow(1-t,0.21);
 }
 
 //fat version (used in cubic bezier)
