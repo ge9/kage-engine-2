@@ -873,9 +873,9 @@ export class Mincho {
 
   adjustTateParam(stroke, others) { // strokes
     //for illegal strokes
-    if (stroke[0] >= 100) return 0;
     if (stroke[1] >= 1000) return ~~(stroke[1] / 1000);
-
+    if (stroke[0] >= 100) return 0;
+    
     //(STROKETYPE.STRAIGHT || STROKETYPE.BENDING || STROKETYPE.VCURVE)
     if (stroke[3] != stroke[5]) return 0;
     var res = 0;
@@ -892,8 +892,8 @@ export class Mincho {
 
   adjustUrokoParam(stroke, others) { // strokes
     //for illegal strokes
-    if (stroke[0] >= 100) return 0;
     if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN
     for (var k = 0; k < this.kAdjustUrokoLengthStep; k++) {
@@ -920,8 +920,8 @@ export class Mincho {
 
   adjustUroko2Param(stroke, others) { // strokes
     //for illegal strokes
-    if (stroke[0] >= 100) return 0;
     if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN && y1==y2
     var pressure = 0;
@@ -943,8 +943,8 @@ export class Mincho {
 
   adjustHaneParam(stroke, epx, epy, others) { // adjust "Hane" (short line turning to the left)
     //for illegal strokes
-    if (stroke[0] >= 100) return 0;
     if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[0] >= 100) return 0;
 
     //endPointX, endPointY
     //(STROKETYPE.STRAIGHT || STROKETYPE.CURVE || STROKETYPE.BEZIER) && ENDTYPE.TURN_LEFT
@@ -968,8 +968,8 @@ export class Mincho {
 
   adjustMageParam(stroke, others) {
     //for illegal strokes
-    if (stroke[0] >= 100) return 0;
     if (stroke[2] >= 1000) return ~~(stroke[2] / 1000);
+    if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.BENDING
     //applied only if y2=y3
@@ -993,8 +993,8 @@ export class Mincho {
 
   adjustKirikuchiParam(stroke, others) { // connecting to other strokes.
     //for illegal strokes
-    if (stroke[0] >= 100) return false;
     if (~~((stroke[1]%1000) / 100) == 1) return true;
+    if (stroke[0] >= 100) return false;
 
     //STROKETYPE.CURVE, STARTTYPE.CONNECTING_V
     if (stroke[3] > stroke[5] &&
@@ -1013,8 +1013,8 @@ export class Mincho {
   
   adjustKakatoParam(stroke, others) {
     //for illegal strokes
-    if (stroke[0] >= 100) return 0;
     if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[0] >= 100) return 0;
 
     
     //if (STROKETYPE.STRAIGHT && (LOWER_LEFT_CORNER || LOWER_RIGHT_CORNER))
