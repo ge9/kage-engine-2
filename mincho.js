@@ -1,5 +1,5 @@
 import { FontCanvas } from "./fontcanvas.js";
-import { get_dir, get_rad, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util.js";
+import { get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util.js";
 import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype.js";
 import { Bezier} from "./bezier.js";
 import { Polygon } from "./polygon.js";
@@ -136,9 +136,10 @@ export class Mincho {
     });
   }
   drawAdjustedStroke(cv, s, others) {//draw stroke on the canvas
-    const a1 = s[0];
-    const a2 = s[1];
-    const a3 = s[2];
+
+    const a1 = s[0] % 100;
+    const a2 = s[1] % 100;
+    const a3 = (s[2] == ENDTYPE.LOWER_LEFT_ZH_OLD || s[2] == ENDTYPE.LOWER_LEFT_ZH_NEW) ? s[2] : s[2] % 100;
     const x1 = s[3];
     const y1 = s[4];
     const x2 = s[5];
@@ -158,6 +159,7 @@ export class Mincho {
     const dir23 = get_dir(x3-x2, y3-y2);
     const dir34 = get_dir(x4-x3, y4-y3);
     const rad12 = get_rad(x2-x1, y2-y1);
+    const rad23 = get_rad(x3-x2, y3-y2);
     
     switch (a1) {
       case 0: {//rotate and flip
@@ -208,7 +210,7 @@ export class Mincho {
               const new_x2 = x2 - this.kMage * (((this.kAdjustTateStep + 4) - param_tate) / (this.kAdjustTateStep + 4));
               cv.drawQBezier(tx1, ty1, x2, y2,
                 new_x2, y2, width_func, t => 0);
-              const param_hane = this.adjustHaneParam(x2, y2, others);
+              const param_hane = this.adjustHaneParam(s, x2, y2, others);
               cv.drawTurnLeft(new_x2, y2, kMinWidthT_m, this.kWidth * 4 * Math.min(1 - param_hane / 10, Math.pow(kMinWidthT_m / this.kMinWidthT, 3)));
               poly_end = this.getEndOfLine(x1, y1, tx1, ty1, kMinWidthT_m);
               break;
@@ -284,7 +286,7 @@ export class Mincho {
               break;
             }
             default:
-              throw ("error: unknown end type at the straight line: "+a1);
+              throw ("error: unknown end type at the straight line: "+a3);
               break;
           }
           //body
@@ -319,7 +321,7 @@ export class Mincho {
         switch (a3) {
           case ENDTYPE.TURN_LEFT: {
             let [tx1, ty1] = moved_point(x3, y3, dir23, -this.kMage);
-            const param_hane = this.adjustHaneParam(x3, y3, others);
+            const param_hane = this.adjustHaneParam(s, x3, y3, others);
             const width_func = (t) => { return this.kMinWidthT; }
             cv.drawQBezier(tx1, ty1, x3, y3, x3 - this.kMage, y3, width_func, t => 0);
             cv.drawTurnLeft(x3 - this.kMage, y3, this.kMinWidthT, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
@@ -490,7 +492,7 @@ export class Mincho {
             let [tx1, ty1] = moved_point(x4, y4, dir34, -this.kMage);
             const width_func = (t) => { return this.kMinWidthT; }
             cv.drawQBezier(tx1, ty1, x4, y4, x4 - this.kMage, y4, width_func, t => 0);
-            const param_hane = this.adjustHaneParam(x4, y4, others);
+            const param_hane = this.adjustHaneParam(s, x4, y4, others);
             cv.drawTurnLeft(x4 - this.kMage, y4, this.kMinWidthT, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
             break;
           case ENDTYPE.TURN_UPWARDS:
@@ -520,6 +522,8 @@ export class Mincho {
         let poly_end = this.getEndOfLine(x1, y1, x2, y2, kMinWidthT_m);
         poly_start.concat(poly_end);
         cv.addPolygon(poly_start);
+        //semicircle for connection point
+        cv.drawTailCircle(x2, y2, rad_to_dir(rad23 + Math.PI), kMinWidthT_m);
         //curve
         const width_func = function (t) {
           //const deltad = Math.pow(1.0-t,0.7)*0.8+0.2;
@@ -868,6 +872,10 @@ export class Mincho {
   //functions for adjustment
 
   adjustTateParam(stroke, others) { // strokes
+    //for illegal strokes
+    if (stroke[0] >= 100) return 0;
+    if (stroke[1] >= 1000) return ~~(stroke[1] / 1000);
+
     //(STROKETYPE.STRAIGHT || STROKETYPE.BENDING || STROKETYPE.VCURVE)
     if (stroke[3] != stroke[5]) return 0;
     var res = 0;
@@ -883,6 +891,10 @@ export class Mincho {
   }
 
   adjustUrokoParam(stroke, others) { // strokes
+    //for illegal strokes
+    if (stroke[0] >= 100) return 0;
+    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN
     for (var k = 0; k < this.kAdjustUrokoLengthStep; k++) {
       var tx, ty, tlen;
@@ -907,6 +919,10 @@ export class Mincho {
   }
 
   adjustUroko2Param(stroke, others) { // strokes
+    //for illegal strokes
+    if (stroke[0] >= 100) return 0;
+    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN && y1==y2
     var pressure = 0;
     for (let other of others) {
@@ -925,7 +941,11 @@ export class Mincho {
     return result;//a3 += res * 100;
   }
 
-  adjustHaneParam(epx, epy, others) { // adjust "Hane" (short line turning to the left)
+  adjustHaneParam(stroke, epx, epy, others) { // adjust "Hane" (short line turning to the left)
+    //for illegal strokes
+    if (stroke[0] >= 100) return 0;
+    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+
     //endPointX, endPointY
     //(STROKETYPE.STRAIGHT || STROKETYPE.CURVE || STROKETYPE.BEZIER) && ENDTYPE.TURN_LEFT
     var res = 0;
@@ -947,6 +967,10 @@ export class Mincho {
   }
 
   adjustMageParam(stroke, others) {
+    //for illegal strokes
+    if (stroke[0] >= 100) return 0;
+    if (stroke[2] >= 1000) return ~~(stroke[2] / 1000);
+
     //STROKETYPE.BENDING
     //applied only if y2=y3
     if (stroke[6] != stroke[8]) return 0;
@@ -968,6 +992,10 @@ export class Mincho {
   }
 
   adjustKirikuchiParam(stroke, others) { // connecting to other strokes.
+    //for illegal strokes
+    if (stroke[0] >= 100) return false;
+    if (~~((stroke[1]%1000) / 100) == 1) return true;
+
     //STROKETYPE.CURVE, STARTTYPE.CONNECTING_V
     if (stroke[3] > stroke[5] &&
       stroke[4] < stroke[6]) {
@@ -984,6 +1012,11 @@ export class Mincho {
   }
   
   adjustKakatoParam(stroke, others) {
+    //for illegal strokes
+    if (stroke[0] >= 100) return 0;
+    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+
+    
     //if (STROKETYPE.STRAIGHT && (LOWER_LEFT_CORNER || LOWER_RIGHT_CORNER))
     for (var k = 0; k < this.kAdjustKakatoStep; k++) {
       if (isCrossBoxWithOthers(others, -1,
