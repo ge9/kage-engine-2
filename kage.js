@@ -7,7 +7,10 @@ export const FONTTYPE = {
   MINCHO: 0,
   GOTHIC: 1,
 }
-
+export const KShotai = {
+    kMincho: 0,
+    kGothic: 1
+}
 export class Kage {
   constructor(type, size){
     this.kBuhin = new Buhin();
