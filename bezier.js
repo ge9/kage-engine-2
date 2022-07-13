@@ -30,8 +30,8 @@ export class Bezier{
     }
     const bez1 = fitCubic_tang(a1, tang1, 0.03);
     const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
-    //const bez1 = fitCurve(a1, 0.01);
-    //const bez2 = fitCurve(a2.reverse(), 0.01);
+    //const bez1 = fitCurve(a1, 0.03);
+    //const bez2 = fitCurve(a2.reverse(), 0.03);
     return [bez1, bez2];
   }
   static generalBezier2(x_fun, y_fun, dx_fun, dy_fun, width_func, width_func_d, dir_func){

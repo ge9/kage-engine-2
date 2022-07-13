@@ -10,6 +10,7 @@ export class Mincho {
     this.kRate = 50;
     if (size == 1) {
       this.kMinWidthY = 1.2;
+      this.kMinWidthU = 1.2;
       this.kMinWidthT = 3.6;
       this.kWidth = 3;
       this.kKakato = 1.8;
@@ -35,6 +36,7 @@ export class Mincho {
       this.kAdjustMageStep = 5;
     } else if (size == 3) {
       this.kMinWidthY = 3;
+      this.kMinWidthU = 3;
       this.kMinWidthT = 8;
       this.kWidth = 6;
       this.kKakato = 4;
@@ -60,6 +62,7 @@ export class Mincho {
       this.kAdjustMageStep = 5;
     } else if (size > 1) {
       this.kMinWidthY = size;
+      this.kMinWidthU = size;
       this.kMinWidthT = size * 2.6;
       this.kWidth = size * 2.2;
       this.kKakato = size * 1.2 + 0.6;
@@ -85,6 +88,7 @@ export class Mincho {
       this.kAdjustMageStep = 5;
     } else {
       this.kMinWidthY = 2;
+      this.kMinWidthU = 2;
       this.kMinWidthT = 6;
       this.kWidth = 5;
       this.kKakato = 3;
@@ -184,11 +188,12 @@ export class Mincho {
           const param_uroko = this.adjustUrokoParam(s, others);
           const param_uroko2 = this.adjustUroko2Param(s, others);
           cv.drawLine(x1, y1, x2, y2, this.kMinWidthY);
+          const urokoScale = (this.kMinWidthU / this.kMinWidthY - 1.0) / 4.0 + 1.0;
           if (y1 == y2) {//horizontal
             const uroko_max = Math.max(param_uroko, param_uroko2);
-            cv.drawUroko_h(x2, y2, this.kMinWidthY, this.kAdjustUrokoX[uroko_max], this.kAdjustUrokoY[uroko_max]);
+            cv.drawUroko_h(x2, y2, this.kMinWidthY, this.kAdjustUrokoX[uroko_max] * urokoScale, this.kAdjustUrokoY[uroko_max] * urokoScale);
           } else {
-            cv.drawUroko(x2, y2, dir, this.kMinWidthY, this.kAdjustUrokoX[param_uroko], this.kAdjustUrokoY[param_uroko]);
+            cv.drawUroko(x2, y2, dir, this.kMinWidthY, this.kAdjustUrokoX[param_uroko] * urokoScale, this.kAdjustUrokoY[param_uroko] * urokoScale);
           }
         } else {//vertical or steep slope
           let poly_end = new Polygon(2);
