@@ -128,7 +128,6 @@ export class FontCanvas {
     this.polygons.push(poly);
   }
 
-  /*
   drawUpperRightCorner(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth) {
     var p = new PointMaker(x1, y1);
     var poly = new Polygon();
@@ -141,7 +140,6 @@ export class FontCanvas {
     //poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
     this.polygons.push(poly);
   }
-  */
 
   drawUpperRightCorner2(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth, is_roofed_thin) {
     var p = new PointMaker(x1, y1);
