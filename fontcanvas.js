@@ -128,6 +128,7 @@ export class FontCanvas {
     this.polygons.push(poly);
   }
 
+  /*
   drawUpperRightCorner(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth) {
     var p = new PointMaker(x1, y1);
     var poly = new Polygon();
@@ -140,21 +141,27 @@ export class FontCanvas {
     //poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
     this.polygons.push(poly);
   }
+  */
 
-  drawUpperRightCorner2(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth) {
+  drawUpperRightCorner2(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth, is_roofed_thin) {
     var p = new PointMaker(x1, y1);
     var poly = new Polygon();
-    poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
-    poly.push2(p.vec(-kMinWidthT*1.1,-kagekMinWidthY));
+    //poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
+    poly.push2(p.vec(-kMinWidthT*1.2,-kagekMinWidthY));
 
     poly.push2(p.vec(0,-kagekMinWidthY - kagekWidth));
     //poly.push2(p.vec(-kMinWidthT*0.1,-kagekMinWidthY - kagekWidth*1.1));
     
     poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
-    poly.push2(p.vec(kMinWidthT,kMinWidthT*0.8), 2);
-    poly.push2(p.vec(0,kMinWidthT*1.2), 2);
-    poly.push2(p.vec(-kMinWidthT*0.9,kMinWidthT*1.2));
-    //poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
+    if (is_roofed_thin) {
+      poly.push2(p.vec(0,kMinWidthT+2));
+      poly.push2(p.vec(0,0));
+    }else{
+      poly.push2(p.vec(kMinWidthT,kMinWidthT*0.8), 2);
+      poly.push2(p.vec(0,kMinWidthT*1.2), 2);
+      poly.push2(p.vec(-kMinWidthT*0.9,kMinWidthT*1.2));
+      //poly.push2(p.vec(-kMinWidthT,kMinWidthT*1.3));
+    }
     this.polygons.push(poly);
   }
   

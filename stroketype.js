@@ -15,7 +15,8 @@ export const STARTTYPE = {
     UPPER_LEFT_CORNER : 12,//the starting point is at the upper left corner.  usually used for vertical lines, like the leftmost stroke of "日".
     UPPER_RIGHT_CORNER : 22,//the starting point is at the upper right corner.  usually used for vertical lines, like the rightmost stroke of "日".
     CONNECTING_V : 32,//vertical strokes connecting to other strokes.  used in the center strokes of "工".
-    THIN : 7//used in the right stroke of "人"
+    THIN : 7,//used in the right stroke of "人"
+    ROOFED_THIN : 27//used in the right stroke of "入"
 }
 export const ENDTYPE = {
     OPEN : 0,//simple lines like "三" or "川" (two strokes on the right side)

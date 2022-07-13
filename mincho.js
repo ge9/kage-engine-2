@@ -313,8 +313,8 @@ export class Mincho {
           else { //from bottom to up
             cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
           }
-        } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER) {
-          cv.drawUpperRightCorner2(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth);
+        } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER || a2 == STARTTYPE.ROOFED_THIN) {
+          cv.drawUpperRightCorner2(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
         } else if (a2 == STARTTYPE.UPPER_LEFT_CORNER) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, -this.kMinWidthY);
           cv.drawUpperLeftCorner(x1ext, y1ext, dir12, this.kMinWidthT);
@@ -343,7 +343,7 @@ export class Mincho {
             break;
           }
           default: {
-            if (a2 == STARTTYPE.THIN && a3 == ENDTYPE.OPEN) {
+            if ((a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) && a3 == ENDTYPE.OPEN) {
               cv.drawL2RSweepEnd(x3, y3, dir23, this.kMinWidthT, this.kL2RDfatten);
             }
             break;
@@ -483,8 +483,8 @@ export class Mincho {
           else { //from bottom to up
             cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
           }
-        } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER) {
-          cv.drawUpperRightCorner(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth);
+        } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER || a2 == STARTTYPE.ROOFED_THIN) {
+          cv.drawUpperRightCorner2(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
         } else if (a2 == STARTTYPE.UPPER_LEFT_CORNER) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, -this.kMinWidthY);
           cv.drawUpperLeftCorner(x1ext, y1ext, dir12, this.kMinWidthT);
@@ -509,7 +509,7 @@ export class Mincho {
             cv.drawTailCircle_tan(x4ex, y4ex, dir34, this.kMinWidthT*1.1, tan1, tan2);
             break;
           default:
-            if (a2 == STARTTYPE.THIN && a3 == ENDTYPE.OPEN) {
+            if ((a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) && a3 == ENDTYPE.OPEN) {
               cv.drawL2RSweepEnd(x4, y4, dir34, this.kMinWidthT, this.kL2RDfatten);
             }
             break;
@@ -553,6 +553,7 @@ export class Mincho {
     switch (a1) {
       case STARTTYPE.OPEN:
       case STARTTYPE.THIN:
+      case STARTTYPE.ROOFED_THIN:
         delta = -1 * this.kMinWidthY * 0.5;
         break;
       case STARTTYPE.UPPER_LEFT_CORNER:
@@ -578,11 +579,24 @@ export class Mincho {
     }
     let [x2, y2] = get_extended_dest(x2pre, y2pre, sx, sy, delta);
 
+    var cornerOffset = 0;
+    if((a1 == STARTTYPE.UPPER_RIGHT_CORNER || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.LEFT_SWEEP){
+      function hypot() {
+        return Math.sqrt(arguments[0] * arguments[0] + arguments[1] * arguments[1]);
+      }
+      var sx1 = sx; var sx2 = sx; var sy1 = sy; var sy2 = sy;
+      var contourLength = hypot(sx1-x1, sy1-y1) + hypot(sx2-sx1, sy2-sy1) + hypot(x2-sx2, y2-sy2);
+      if (contourLength < 100){
+        cornerOffset = (this.kMinWidthT > 6) ? (this.kMinWidthT - 6) * ((100 - contourLength) / 100) : 0;
+        x1 += cornerOffset;
+      }
+    }
+
     var width_func;
     var width_func_d;
     let bez1, bez2;
     let thin_stop_param;
-    if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.STOP) { //stop
+    if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.STOP) { //stop
       //const slant_cos = 
       const len=Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
       thin_stop_param = (1 + (len-100)*0.0007);
@@ -592,7 +606,7 @@ export class Mincho {
       [bez1, bez2] = Bezier.qBezier2(x1, y1, sx, sy, x2, y2, width_func, width_func_d);
     }
     else {
-      if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.OPEN) { // L2RD: fatten
+      if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.OPEN) { // L2RD: fatten
         width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
       }
@@ -601,7 +615,7 @@ export class Mincho {
         //don't feel like 'export'ing CURVE_THIN for this experimental change...
         width_func_d = t => {return (-0.628-30*Math.pow((1-t),29)*0.600)*this.kMinWidthT};
       }
-      else if (a1 == STARTTYPE.THIN) {
+      else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) {
         width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT);
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT);
       }
@@ -641,7 +655,7 @@ export class Mincho {
     cv.addPolygon(poly);
 
     if(a2 == ENDTYPE.STOP){
-      if(a1 == STARTTYPE.THIN){
+      if(a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN){
         const bez1e = bez1[bez1.length - 1][3];
       const bez1c2 = bez1[bez1.length - 1][2];
       const bez2s = bez2[0][0];
@@ -689,11 +703,23 @@ export class Mincho {
     }
     let [x2, y2] = get_extended_dest(x2pre, y2pre, sx2, sy2, delta);
 
+    var cornerOffset = 0;
+    if((a1 == STARTTYPE.UPPER_RIGHT_CORNER || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.LEFT_SWEEP){
+      function hypot() {
+        return Math.sqrt(arguments[0] * arguments[0] + arguments[1] * arguments[1]);
+      }
+      var contourLength = hypot(sx1-x1, sy1-y1) + hypot(sx2-sx1, sy2-sy1) + hypot(x2-sx2, y2-sy2);
+      if (contourLength < 100){
+        cornerOffset = (this.kMinWidthT > 6) ? (this.kMinWidthT - 6) * ((100 - contourLength) / 100) : 0;
+        x1 += cornerOffset;
+      }
+    }
+
     var width_func;
     var width_func_d;
     let bez1, bez2;
     
-    if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.STOP) { //stop
+    if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.STOP) { //stop
       width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT);
       width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT);
 
@@ -704,11 +730,11 @@ export class Mincho {
       //[bez1, bez2] = Bezier.cBezier_slant(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d);
     }
     else {
-      if (a1 == STARTTYPE.THIN && a2 == ENDTYPE.OPEN) { // L2RD: fatten
+      if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.OPEN) { // L2RD: fatten
         width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
       }
-      else if (a1 == STARTTYPE.THIN) {
+      else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) {
         width_func = t => widfun_fat(t, x1, y1, x2, y2, this.kMinWidthT);
         width_func_d = t => widfun_fat_d(t, x1, y1, x2, y2, this.kMinWidthT);
       }
