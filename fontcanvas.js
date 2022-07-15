@@ -152,8 +152,8 @@ export class FontCanvas {
     
     poly.push2(p.vec(kMinWidthT+kagekWidth,kagekMinWidthY));
     if (is_roofed_thin) {
-      poly.push2(p.vec(0,kMinWidthT+2));
-      poly.push2(p.vec(0,0));
+      poly.push2(p.vec(kMinWidthT*0.3,kMinWidthT*1.15));
+      poly.push2(p.vec(0,kagekMinWidthY));
     }else{
       poly.push2(p.vec(kMinWidthT,kMinWidthT*0.8), 2);
       poly.push2(p.vec(0,kMinWidthT*1.2), 2);

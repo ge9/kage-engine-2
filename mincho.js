@@ -304,47 +304,48 @@ export class Mincho {
 
 
       case STROKETYPE.CURVE: {
+        const kMinWidthT_mod = this.kMinWidthT - ~~((s[1] % 10000) / 1000) / 2
         //head
         if (a2 == STARTTYPE.OPEN) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, 1 * this.kMinWidthY * 0.5);
           if (y1ext <= y3) { //from up to bottom
-            cv.drawOpenBegin_curve_down(x1ext, y1ext, rad12, this.kMinWidthT, this.kMinWidthY);
+            cv.drawOpenBegin_curve_down(x1ext, y1ext, rad12, kMinWidthT_mod, this.kMinWidthY);
           }
           else { //from bottom to up
-            cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
+            cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, kMinWidthT_mod, this.kMinWidthY);
           }
         } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER || a2 == STARTTYPE.ROOFED_THIN) {
-          cv.drawUpperRightCorner2(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
+          cv.drawUpperRightCorner2(x1, y1, kMinWidthT_mod, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
         } else if (a2 == STARTTYPE.UPPER_LEFT_CORNER) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, -this.kMinWidthY);
-          cv.drawUpperLeftCorner(x1ext, y1ext, dir12, this.kMinWidthT);
+          cv.drawUpperLeftCorner(x1ext, y1ext, dir12, kMinWidthT_mod);
         }
         //body
         const a2temp = (a2 == STARTTYPE.CONNECTING_V && this.adjustKirikuchiParam(s, others)) ? 100 + a2 : a2;
-        this.minchoDrawCurve(x1, y1, x2, y2, x3, y3, a2temp, a3, cv);
+        this.minchoDrawCurve(x1, y1, x2, y2, x3, y3, a2temp, a3, cv, kMinWidthT_mod);
         //tail
         switch (a3) {
           case ENDTYPE.TURN_LEFT: {
             let [tx1, ty1] = moved_point(x3, y3, dir23, -this.kMage);
             const param_hane = this.adjustHaneParam(s, x3, y3, others);
-            const width_func = (t) => { return this.kMinWidthT; }
+            const width_func = (t) => { return kMinWidthT_mod; }
             cv.drawQBezier(tx1, ty1, x3, y3, x3 - this.kMage, y3, width_func, t => 0);
-            cv.drawTurnLeft(x3 - this.kMage, y3, this.kMinWidthT, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
+            cv.drawTurnLeft(x3 - this.kMage, y3, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
             break;
           }
           case ENDTYPE.TURN_UPWARDS: {
-            cv.drawTailCircle(x3, y3, dir23, this.kMinWidthT);
-            cv.drawTurnUpwards_pos(x3, y3, this.kMinWidthT, this.kWidth*5, (y1<y3)?DIR_POSX:DIR_NEGX);
+            cv.drawTailCircle(x3, y3, dir23, kMinWidthT_mod);
+            cv.drawTurnUpwards_pos(x3, y3, kMinWidthT_mod, this.kWidth*5, (y1<y3)?DIR_POSX:DIR_NEGX);
             break;
           }
           case ENDTYPE.STOP: {
-            //let [x3ex, y3ex] = moved_point(x3, y3, dir23, -1 * this.kMinWidthT * 0.52);
-            //cv.drawTailCircle_tan(x3ex, y3ex, dir23, this.kMinWidthT*1.1, tan1, tan2);
+            //let [x3ex, y3ex] = moved_point(x3, y3, dir23, -1 * kMinWidthT_mod * 0.52);
+            //cv.drawTailCircle_tan(x3ex, y3ex, dir23, kMinWidthT_mod*1.1, tan1, tan2);
             break;
           }
           default: {
             if ((a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) && a3 == ENDTYPE.OPEN) {
-              cv.drawL2RSweepEnd(x3, y3, dir23, this.kMinWidthT, this.kL2RDfatten);
+              cv.drawL2RSweepEnd(x3, y3, dir23, kMinWidthT_mod, this.kL2RDfatten);
             }
             break;
           }
@@ -473,44 +474,45 @@ export class Mincho {
 
 
       case STROKETYPE.BEZIER: {
+        const kMinWidthT_mod = this.kMinWidthT - ~~((s[1] % 10000) / 1000) / 2
         //head
         if (a2 == STARTTYPE.OPEN) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, 1 * this.kMinWidthY * 0.5);
 
           if (y1ext <= y4) { //from up to bottom
-            cv.drawOpenBegin_curve_down(x1ext, y1ext, rad12, this.kMinWidthT, this.kMinWidthY);
+            cv.drawOpenBegin_curve_down(x1ext, y1ext, rad12, kMinWidthT_mod, this.kMinWidthY);
           }
           else { //from bottom to up
-            cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, this.kMinWidthT, this.kMinWidthY);
+            cv.drawOpenBegin_curve_up(x1ext, y1ext, dir12, kMinWidthT_mod, this.kMinWidthY);
           }
         } else if (a2 == STARTTYPE.UPPER_RIGHT_CORNER || a2 == STARTTYPE.ROOFED_THIN) {
-          cv.drawUpperRightCorner2(x1, y1, this.kMinWidthT, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
+          cv.drawUpperRightCorner2(x1, y1, kMinWidthT_mod, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
         } else if (a2 == STARTTYPE.UPPER_LEFT_CORNER) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, -this.kMinWidthY);
-          cv.drawUpperLeftCorner(x1ext, y1ext, dir12, this.kMinWidthT);
+          cv.drawUpperLeftCorner(x1ext, y1ext, dir12, kMinWidthT_mod);
         }
         //body
-        let [tan1, tan2] = this.minchoDrawBezier(x1, y1, x2, y2, x3, y3, x4, y4, a2, a3, cv);
+        let [tan1, tan2] = this.minchoDrawBezier(x1, y1, x2, y2, x3, y3, x4, y4, a2, a3, cv, kMinWidthT_mod);
         //tail
         switch (a3) {
           case ENDTYPE.TURN_LEFT:
             let [tx1, ty1] = moved_point(x4, y4, dir34, -this.kMage);
-            const width_func = (t) => { return this.kMinWidthT; }
+            const width_func = (t) => { return kMinWidthT_mod; }
             cv.drawQBezier(tx1, ty1, x4, y4, x4 - this.kMage, y4, width_func, t => 0);
             const param_hane = this.adjustHaneParam(s, x4, y4, others);
-            cv.drawTurnLeft(x4 - this.kMage, y4, this.kMinWidthT, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
+            cv.drawTurnLeft(x4 - this.kMage, y4, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
             break;
           case ENDTYPE.TURN_UPWARDS:
-            cv.drawTailCircle(x4, y4, dir34, this.kMinWidthT);
-            cv.drawTurnUpwards_pos(x4, y4, this.kMinWidthT, this.kWidth*5, (y1<y4)?DIR_POSX:DIR_NEGX);
+            cv.drawTailCircle(x4, y4, dir34, kMinWidthT_mod);
+            cv.drawTurnUpwards_pos(x4, y4, kMinWidthT_mod, this.kWidth*5, (y1<y4)?DIR_POSX:DIR_NEGX);
             break;
           case ENDTYPE.STOP:
-            let [x4ex, y4ex] = moved_point(x4, y4, dir34, -this.kMinWidthT * 0.52);
-            cv.drawTailCircle_tan(x4ex, y4ex, dir34, this.kMinWidthT*1.1, tan1, tan2);
+            let [x4ex, y4ex] = moved_point(x4, y4, dir34, -kMinWidthT_mod * 0.52);
+            cv.drawTailCircle_tan(x4ex, y4ex, dir34, kMinWidthT_mod*1.1, tan1, tan2);
             break;
           default:
             if ((a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) && a3 == ENDTYPE.OPEN) {
-              cv.drawL2RSweepEnd(x4, y4, dir34, this.kMinWidthT, this.kL2RDfatten);
+              cv.drawL2RSweepEnd(x4, y4, dir34, kMinWidthT_mod, this.kL2RDfatten);
             }
             break;
         }
@@ -548,7 +550,7 @@ export class Mincho {
     }
   }
 
-  minchoDrawCurve(x1pre, y1pre, sx, sy, x2pre, y2pre, a1, a2, cv) {
+  minchoDrawCurve(x1pre, y1pre, sx, sy, x2pre, y2pre, a1, a2, cv, kMinWidthT_mod) {
     var delta;
     switch (a1) {
       case STARTTYPE.OPEN:
@@ -568,7 +570,7 @@ export class Mincho {
 
     switch (a2) {
       case ENDTYPE.STOP: // get shorten for tail's circle
-        delta = -1 * this.kMinWidthT * 0.52;
+        delta = -1 * kMinWidthT_mod * 0.52;
         break;
       case ENDTYPE.TURN_LEFT:
         delta = -this.kMage;
@@ -587,7 +589,7 @@ export class Mincho {
       var sx1 = sx; var sx2 = sx; var sy1 = sy; var sy2 = sy;
       var contourLength = hypot(sx1-x1, sy1-y1) + hypot(sx2-sx1, sy2-sy1) + hypot(x2-sx2, y2-sy2);
       if (contourLength < 100){
-        cornerOffset = (this.kMinWidthT > 6) ? (this.kMinWidthT - 6) * ((100 - contourLength) / 100) : 0;
+        cornerOffset = (kMinWidthT_mod > 6) ? (kMinWidthT_mod - 6) * ((100 - contourLength) / 100) : 0;
         x1 += cornerOffset;
       }
     }
@@ -601,30 +603,30 @@ export class Mincho {
       const len=Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
       thin_stop_param = (1 + (len-100)*0.0007);
       
-      width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT)*thin_stop_param;
-      width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT)*thin_stop_param;
+      width_func = t => widfun_stop(t, x1, y1, x2, y2, kMinWidthT_mod)*thin_stop_param;
+      width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, kMinWidthT_mod)*thin_stop_param;
       [bez1, bez2] = Bezier.qBezier2(x1, y1, sx, sy, x2, y2, width_func, width_func_d);
     }
     else {
       if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.OPEN) { // L2RD: fatten
-        width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
-        width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
+        width_func = t => widfun(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
+        width_func_d = t => widfun_d(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
       }
       else if (a1 == STARTTYPE.CONNECTING_V && a2 == ENDTYPE.OPEN) { //未使用。さんずい用 (実験)
-        width_func = t => {return ((1-t)*0.628+Math.pow((1-t),30)*0.600+0.222)*this.kMinWidthT};
+        width_func = t => {return ((1-t)*0.628+Math.pow((1-t),30)*0.600+0.222)*kMinWidthT_mod};
         //don't feel like 'export'ing CURVE_THIN for this experimental change...
-        width_func_d = t => {return (-0.628-30*Math.pow((1-t),29)*0.600)*this.kMinWidthT};
+        width_func_d = t => {return (-0.628-30*Math.pow((1-t),29)*0.600)*kMinWidthT_mod};
       }
       else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) {
-        width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT);
-        width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT);
+        width_func = t => widfun(t, x1, y1, x2, y2, kMinWidthT_mod);
+        width_func_d = t => widfun_d(t, x1, y1, x2, y2, kMinWidthT_mod);
       }
       else if (a2 == ENDTYPE.LEFT_SWEEP) {
-        width_func = t => widfun(1 - t, x1, y1, x2, y2, this.kMinWidthT);
-        width_func_d = t => -widfun_d(1 - t, x1, y1, x2, y2, this.kMinWidthT);
+        width_func = t => widfun(1 - t, x1, y1, x2, y2, kMinWidthT_mod);
+        width_func_d = t => -widfun_d(1 - t, x1, y1, x2, y2, kMinWidthT_mod);
       }
       else {
-        width_func = t => this.kMinWidthT;
+        width_func = t => kMinWidthT_mod;
         width_func_d = t => 0;
       }
       [bez1, bez2] = Bezier.qBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d);
@@ -665,15 +667,15 @@ export class Mincho {
       const cent_x = (x1 + 4*sx + x2) / 6;
       const cent_y = (y1 + 4*sy + y2) / 6;
       var rad_end = get_dir(x2-cent_x, y2-cent_y);
-       cv.drawTailCircle_tan(x2, y2, rad_end, this.kMinWidthT*1.1*thin_stop_param, tan1, tan2);
+       cv.drawTailCircle_tan(x2, y2, rad_end, kMinWidthT_mod*1.1*thin_stop_param, tan1, tan2);
       }else{
         const enddir = get_dir(x2-sx, y2-sy);
-        cv.drawTailCircle(x2, y2, enddir, this.kMinWidthT);
+        cv.drawTailCircle(x2, y2, enddir, kMinWidthT_mod);
       }
     }
   }
 
-  minchoDrawBezier(x1pre, y1pre, sx1, sy1, sx2, sy2, x2pre, y2pre, a1, a2, cv) {
+  minchoDrawBezier(x1pre, y1pre, sx1, sy1, sx2, sy2, x2pre, y2pre, a1, a2, cv, kMinWidthT_mod) {
     var delta;
     switch (a1) {
       case STARTTYPE.OPEN:
@@ -692,7 +694,7 @@ export class Mincho {
 
     switch (a2) {
       case ENDTYPE.STOP: // get shorten for tail's circle
-        delta = -1 * this.kMinWidthT * 0.52;
+        delta = -1 * kMinWidthT_mod * 0.52;
         break;
       case ENDTYPE.TURN_LEFT:
         delta = -this.kMage;
@@ -710,7 +712,7 @@ export class Mincho {
       }
       var contourLength = hypot(sx1-x1, sy1-y1) + hypot(sx2-sx1, sy2-sy1) + hypot(x2-sx2, y2-sy2);
       if (contourLength < 100){
-        cornerOffset = (this.kMinWidthT > 6) ? (this.kMinWidthT - 6) * ((100 - contourLength) / 100) : 0;
+        cornerOffset = (kMinWidthT_mod > 6) ? (kMinWidthT_mod - 6) * ((100 - contourLength) / 100) : 0;
         x1 += cornerOffset;
       }
     }
@@ -720,30 +722,30 @@ export class Mincho {
     let bez1, bez2;
     
     if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.STOP) { //stop
-      width_func = t => widfun_stop(t, x1, y1, x2, y2, this.kMinWidthT);
-      width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, this.kMinWidthT);
+      width_func = t => widfun_stop(t, x1, y1, x2, y2, kMinWidthT_mod);
+      width_func_d = t => widfun_stop_d(t, x1, y1, x2, y2, kMinWidthT_mod);
 
       [bez1, bez2] = Bezier.cBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d);
 
-      //width_func = t => widfun_fat(t, x1, y1, x2, y2, this.kMinWidthT);
-      //width_func_d = t => widfun_fat_d(t, x1, y1, x2, y2, this.kMinWidthT);
+      //width_func = t => widfun_fat(t, x1, y1, x2, y2, kMinWidthT_mod);
+      //width_func_d = t => widfun_fat_d(t, x1, y1, x2, y2, kMinWidthT_mod);
       //[bez1, bez2] = Bezier.cBezier_slant(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d);
     }
     else {
       if ((a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.OPEN) { // L2RD: fatten
-        width_func = t => widfun(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
-        width_func_d = t => widfun_d(t, x1, y1, x2, y2, this.kMinWidthT) * this.kL2RDfatten;
+        width_func = t => widfun(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
+        width_func_d = t => widfun_d(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
       }
       else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) {
-        width_func = t => widfun_fat(t, x1, y1, x2, y2, this.kMinWidthT);
-        width_func_d = t => widfun_fat_d(t, x1, y1, x2, y2, this.kMinWidthT);
+        width_func = t => widfun_fat(t, x1, y1, x2, y2, kMinWidthT_mod);
+        width_func_d = t => widfun_fat_d(t, x1, y1, x2, y2, kMinWidthT_mod);
       }
       else if (a2 == ENDTYPE.LEFT_SWEEP) {
-        width_func = t => widfun(1 - t, x1, y1, x2, y2, this.kMinWidthT);
-        width_func_d = t => -widfun_d(1 - t, x1, y1, x2, y2, this.kMinWidthT);
+        width_func = t => widfun(1 - t, x1, y1, x2, y2, kMinWidthT_mod);
+        width_func_d = t => -widfun_d(1 - t, x1, y1, x2, y2, kMinWidthT_mod);
       }
       else {
-        width_func = t => this.kMinWidthT;
+        width_func = t => kMinWidthT_mod;
         width_func_d = t => 0;
       }
       [bez1, bez2] = Bezier.cBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d);
@@ -904,7 +906,7 @@ export class Mincho {
 
   adjustTateParam(stroke, others) { // strokes
     //for illegal strokes
-    if (stroke[1] >= 1000) return ~~(stroke[1] / 1000);
+    if (stroke[1] >= 1000) return ~~((stroke[1] % 10000) / 1000);
     if (stroke[0] >= 100) return 0;
     
     //(STROKETYPE.STRAIGHT || STROKETYPE.BENDING || STROKETYPE.VCURVE)
@@ -923,7 +925,7 @@ export class Mincho {
 
   adjustUrokoParam(stroke, others) { // strokes
     //for illegal strokes
-    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[2] >= 100) return ~~((stroke[2] % 1000) / 100);
     if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN
@@ -951,7 +953,7 @@ export class Mincho {
 
   adjustUroko2Param(stroke, others) { // strokes
     //for illegal strokes
-    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[2] >= 100) return ~~((stroke[2] % 1000) / 100);
     if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN && y1==y2
@@ -974,7 +976,7 @@ export class Mincho {
 
   adjustHaneParam(stroke, epx, epy, others) { // adjust "Hane" (short line turning to the left)
     //for illegal strokes
-    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[2] >= 100) return ~~((stroke[2] % 1000) / 100);
     if (stroke[0] >= 100) return 0;
 
     //endPointX, endPointY
@@ -999,7 +1001,7 @@ export class Mincho {
 
   adjustMageParam(stroke, others) {
     //for illegal strokes
-    if (stroke[2] >= 1000) return ~~(stroke[2] / 1000);
+    if (stroke[2] >= 1000) return ~~((stroke[2] % 10000) / 1000);
     if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.BENDING
@@ -1044,7 +1046,7 @@ export class Mincho {
   
   adjustKakatoParam(stroke, others) {
     //for illegal strokes
-    if (stroke[2] >= 100) return ~~(stroke[2] / 100);
+    if (stroke[2] >= 100) return ~~((stroke[2] % 1000) / 100);
     if (stroke[0] >= 100) return 0;
 
     
