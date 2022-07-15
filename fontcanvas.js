@@ -181,7 +181,7 @@ export class FontCanvas {
     const rad_diff = (rad - Math.PI*0.621) * 0.5
     var poly = new Polygon();
     let p0 = new PointMaker(x1, y1, rad_to_dir(rad), kMinWidthT)
-    poly.push2(p0.vec(0.5, 1));
+    poly.push2(p0.vec(1, 1));
     poly.push2(p0.vec(Math.sin(rad_diff), 1));
     let p1 = new PointMaker(x1, y1, dir);
     let[x, y] = p1.vec(0, -kMinWidthT);

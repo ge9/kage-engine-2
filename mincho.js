@@ -786,7 +786,7 @@ export class Mincho {
       switch (a1) {
         case 0:
           right1 = -this.kMinWidthT * 0.5;
-          left1 =  -this.kMinWidthT * 1.0;
+          left1 =  -this.kMinWidthT * 0.8;
           break;
         case 12:
           right1 = this.kMinWidthY + kMinWidthT;
