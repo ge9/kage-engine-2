@@ -299,6 +299,7 @@ export class FontCanvas {
     poly.push(x2 - kMinWidthT * 2, y2);
     poly.push(x2 - kagekMinWidthY, y2 + kagekMinWidthY * 5);
     poly.push(x2 + kMinWidthT, y2 + kagekMinWidthY);
+    //poly.push(x2 + kMinWidthT, y2);
     poly.reverse();
     this.polygons.push(poly);
   }

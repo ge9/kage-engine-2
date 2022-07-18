@@ -330,7 +330,7 @@ export class Mincho {
             const param_hane = this.adjustHaneParam(s, x3, y3, others);
             const width_func = (t) => { return kMinWidthT_mod; }
             cv.drawQBezier(tx1, ty1, x3, y3, x3 - this.kMage, y3, width_func, t => 0);
-            cv.drawTurnLeft(x3 - this.kMage, y3, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
+            cv.drawTurnLeft(x3 - this.kMage, y3, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, Math.pow(kMinWidthT_mod / this.kMinWidthT, 3)));
             break;
           }
           case ENDTYPE.TURN_UPWARDS: {
@@ -500,7 +500,7 @@ export class Mincho {
             const width_func = (t) => { return kMinWidthT_mod; }
             cv.drawQBezier(tx1, ty1, x4, y4, x4 - this.kMage, y4, width_func, t => 0);
             const param_hane = this.adjustHaneParam(s, x4, y4, others);
-            cv.drawTurnLeft(x4 - this.kMage, y4, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, 1));
+            cv.drawTurnLeft(x4 - this.kMage, y4, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, Math.pow(kMinWidthT_mod / this.kMinWidthT, 3)));
             break;
           case ENDTYPE.TURN_UPWARDS:
             cv.drawTailCircle(x4, y4, dir34, kMinWidthT_mod);
@@ -786,7 +786,7 @@ export class Mincho {
       switch (a1) {
         case 0:
           right1 = -this.kMinWidthT * 0.5;
-          left1 =  -this.kMinWidthT * 0.8;
+          left1 =  -this.kMinWidthT * 0.7;
           break;
         case 12:
           right1 = this.kMinWidthY + kMinWidthT;
@@ -835,7 +835,7 @@ export class Mincho {
         switch (a1) {
           case 0:
             right1 = -this.kMinWidthT * 0.5;
-            left1 = -this.kMinWidthT * 1.0;
+            left1 = -this.kMinWidthT * 0.7;
             break;
           case 12:
             right1 = this.kMinWidthY + kMinWidthT;

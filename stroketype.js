@@ -9,6 +9,8 @@ export const STROKETYPE = {
     REFERENCE : 99,
 }
 export const STARTTYPE = {
+    // INTERNAL_FOR_BENDING : 6,
+    // INTERNAL_PLANE : 1,
     OPEN : 0,//simple lines like "三" or "川" (two strokes on the right side)
              //also used in the left stroke of "人"
     CONNECTING_H : 2,//horizontal strokes connecting to other strokes.  used in the center strokes of "日".
@@ -19,6 +21,10 @@ export const STARTTYPE = {
     ROOFED_THIN : 27//used in the right stroke of "入"
 }
 export const ENDTYPE = {
+    // INTERNAL_LAST_FILLED_CIRCLE : 1,
+    // INTERNAL_TURN_LEFT : 14,//used in original KAGE-engine implementation
+    // INTERNAL_TURN_UPWARDS : 15,//used in original KAGE-engine implementation
+    
     OPEN : 0,//simple lines like "三" or "川" (two strokes on the right side)
              //also used in the right stroke of "人"(L2R sweep)
     CONNECTING_H : 2,
