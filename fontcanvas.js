@@ -410,7 +410,7 @@ export class FontCanvas {
     poly.push(x2, y2 - kMinWidthT);
     poly.push(x2 - length_param, y2 - kMinWidthT);
     poly.push(x2 - length_param, y2 - kMinWidthT * 0.5);
-    poly.push(x2 - kMinWidthT*0.7, y2 - kMinWidthT * 0.3,2);
+    poly.push(x2 - kMinWidthT*0.3, y2 - kMinWidthT * 0.3,2);
     poly.push(x2, y2 + kMinWidthT * 0.3, 2);
     poly.push(x2, y2 + kMinWidthT);
     poly.reverse();

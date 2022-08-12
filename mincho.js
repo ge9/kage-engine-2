@@ -6,7 +6,7 @@ import { Polygon } from "./polygon.js";
 import {isCrossBoxWithOthers,isCrossWithOthers} from "./2d.js";
 export class Mincho {
   constructor(size) {
-    //if (!size) size=2.1;
+    //if (!size) size=2.3;
     this.kRate = 50;
     if (size == 1) {
       this.kMinWidthY = 1.2;
@@ -69,11 +69,13 @@ export class Mincho {
       this.kL2RDfatten = 1.2;
       this.kMage = size * 4 + 2;
 
-      this.kAdjustKakatoL = ([size * 4 + 1, size * 3+0.75, size * 2 + 0.5, size * 1 + 0.25]); // for KAKATO adjustment 000,100,200,300,400
-      this.kAdjustKakatoR = ([size * 3.2, size * 2.4, size * 1.6, size * 0.8]); // for KAKATO adjustment 000,100,200,300
-      this.kAdjustKakatoRangeX = size * 4 + 8; // check area width
-      this.kAdjustKakatoRangeY = ([size, size * 5 + 3, size * 9 + 5, size * 12 + 6]); // 3 steps of checking
-      this.kAdjustKakatoStep = 3; // number of steps
+      this.kAdjustKakatoL = ([size * 6 + 1, size * 5 + 1, size * 4 + 1, size * 3+0.75, size * 2 + 0.5, size * 1 + 0.25]); // for KAKATO adjustment 000,100,200,300,400
+      this.kAdjustKakatoR = ([6,4,2,0]); // for KAKATO adjustment 000,100,200,300
+      this.kAdjustKakatoR[-1] = 8
+      this.kAdjustKakatoR[-2] = 10
+      this.kAdjustKakatoRangeX = 26; // check area width
+      this.kAdjustKakatoRangeY = ([11, 13, 15, 17, 19, 21]); // 3 steps of checking
+      this.kAdjustKakatoStep = 5; // number of steps
 
       this.kAdjustUrokoX = ([size * 9.5 + 4, size * 8 + 3.5, size * 6.5 + 3, size * 5 + 2.5]); // for UROKO adjustment 000,100,200,300
       this.kAdjustUrokoY = ([size * 4.6 + 2, size * 4.4 + 1.5, size * 4.2 + 1, size * 4.0 + 0.5]); // for UROKO adjustment 000,100,200,300
@@ -152,12 +154,12 @@ export class Mincho {
     const y3 = s[8];
     const x4 = s[9];
     const y4 = s[10];
-    if(a2>100){
-      console.log("error: start type"+a2)
-    }
-    if(a3>100){
-      console.log("error: end type"+a3)
-    }
+    //if(a2>100){
+    //  console.log("error: start type"+a2)
+    //}
+    //if(a3>100){
+    //  console.log("error: end type"+a3)
+    //}
     
     const dir12 = get_dir(x2-x1, y2-y1);
     const dir23 = get_dir(x3-x2, y3-y2);
@@ -190,7 +192,9 @@ export class Mincho {
           cv.drawLine(x1, y1, x2, y2, this.kMinWidthY);
           const urokoScale = (this.kMinWidthU / this.kMinWidthY - 1.0) / 4.0 + 1.0;
           if (y1 == y2) {//horizontal
-            const uroko_max = Math.max(param_uroko, param_uroko2);
+            const uroko_max = param_uroko == 0 ? param_uroko2 : param_uroko 
+            //↑元の実装だとadjustUrokoによる調整がかかったものはadjustUroko2を一切通らないのでそれ以上小さくならない。
+            //実際には Math.max(param_uroko, param_uroko2) などのほうが合理的かも
             cv.drawUroko_h(x2, y2, this.kMinWidthY, this.kAdjustUrokoX[uroko_max] * urokoScale, this.kAdjustUrokoY[uroko_max] * urokoScale);
           } else {
             cv.drawUroko(x2, y2, dir, this.kMinWidthY, this.kAdjustUrokoX[param_uroko] * urokoScale, this.kAdjustUrokoY[param_uroko] * urokoScale);
@@ -326,7 +330,7 @@ export class Mincho {
         //tail
         switch (a3) {
           case ENDTYPE.TURN_LEFT: {
-            let [tx1, ty1] = moved_point(x3, y3, dir23, -this.kMage);
+            let [tx1, ty1] = moved_point(x3, y3, dir23, -this.kMage*0.439);
             const param_hane = this.adjustHaneParam(s, x3, y3, others);
             const width_func = (t) => { return kMinWidthT_mod; }
             cv.drawQBezier(tx1, ty1, x3, y3, x3 - this.kMage, y3, width_func, t => 0);
@@ -496,7 +500,7 @@ export class Mincho {
         //tail
         switch (a3) {
           case ENDTYPE.TURN_LEFT:
-            let [tx1, ty1] = moved_point(x4, y4, dir34, -this.kMage);
+            let [tx1, ty1] = moved_point(x4, y4, dir34, -this.kMage*0.439);
             const width_func = (t) => { return kMinWidthT_mod; }
             cv.drawQBezier(tx1, ty1, x4, y4, x4 - this.kMage, y4, width_func, t => 0);
             const param_hane = this.adjustHaneParam(s, x4, y4, others);
@@ -573,7 +577,7 @@ export class Mincho {
         delta = -1 * kMinWidthT_mod * 0.52;
         break;
       case ENDTYPE.TURN_LEFT:
-        delta = -this.kMage;
+        delta = -this.kMage * 0.439;
         break;
       default:
         delta = 0;
@@ -612,7 +616,7 @@ export class Mincho {
         width_func = t => widfun(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
       }
-      else if (a1 == STARTTYPE.CONNECTING_V && a2 == ENDTYPE.OPEN) { //未使用。さんずい用 (実験)
+      else if (a1 == STARTTYPE.CONNECTING_V && a2 == ENDTYPE.LOWER_LEFT_CORNER) { //未使用。さんずい用 (実験)
         width_func = t => {return ((1-t)*0.628+Math.pow((1-t),30)*0.600+0.222)*kMinWidthT_mod};
         //don't feel like 'export'ing CURVE_THIN for this experimental change...
         width_func_d = t => {return (-0.628-30*Math.pow((1-t),29)*0.600)*kMinWidthT_mod};
@@ -697,7 +701,7 @@ export class Mincho {
         delta = -1 * kMinWidthT_mod * 0.52;
         break;
       case ENDTYPE.TURN_LEFT:
-        delta = -this.kMage;
+        delta = -this.kMage*0.439;
         break;
       default:
         delta = 0;
