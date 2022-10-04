@@ -342,7 +342,7 @@ export class FontCanvas {
     poly.push2(p.vec(0, -1));
     poly.push2(p.vec(1.5, -1), 2);
     poly.push2(p.vec(0.9,  1), 2);
-    poly.push2(p.vec(-1,  1));
+    poly.push2(p.vec(0,  1));
     this.polygons.push(poly);
   }
 
@@ -352,7 +352,7 @@ export class FontCanvas {
     poly.push2(p.vec(0, 1));
     poly.push2(p.vec(1.5, 1), 2);
     poly.push2(p.vec(0.9,  -1), 2);
-    poly.push2(p.vec(-1,  -1));
+    poly.push2(p.vec(0,  -1));
     poly.reverse();
     this.polygons.push(poly);
   }

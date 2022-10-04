@@ -383,9 +383,9 @@ export class Mincho {
 
         //last line
         if (tx2 < x3) {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, kMinWidthT_mage, 0, 0, 0, -kMinWidthT_mage);
+          cv.drawOffsetLine(tx2, ty2, x3, y3, kMinWidthT_mage, 0, 0, 0, 0*-kMinWidthT_mage);
         } else {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, kMinWidthT_mage, 0, 0, -kMinWidthT_mage, 0);
+          cv.drawOffsetLine(tx2, ty2, x3, y3, kMinWidthT_mage, 0, 0, 0*-kMinWidthT_mage, 0);
         }
         if (y2 == y3) {
           if (tx2 < x3) {
@@ -440,9 +440,9 @@ export class Mincho {
 
         //last line
         if (tx2 < x3) {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, this.kMinWidthT, 0, 0, 0, -this.kMinWidthT);
+          cv.drawOffsetLine(tx2, ty2, x3, y3, this.kMinWidthT, 0, 0, 0, 0*-this.kMinWidthT);
         } else {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, this.kMinWidthT, 0, 0, -this.kMinWidthT, 0);
+          cv.drawOffsetLine(tx2, ty2, x3, y3, this.kMinWidthT, 0, 0, 0*-this.kMinWidthT, 0);
         }
         if (y2 == y3) {
           if (tx2 < x3) {
