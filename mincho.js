@@ -1,5 +1,5 @@
 import { FontCanvas } from "./fontcanvas.js";
-import { get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y} from "./util.js";
+import { get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y, bezier_to_line} from "./util.js";
 import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype.js";
 import { Bezier} from "./bezier.js";
 import { Polygon } from "./polygon.js";
@@ -160,7 +160,6 @@ export class Mincho {
     //if(a3>100){
     //  console.log("error: end type"+a3)
     //}
-    
     const dir12 = get_dir(x2-x1, y2-y1);
     const dir23 = get_dir(x3-x2, y3-y2);
     const dir34 = get_dir(x4-x3, y4-y3);
@@ -205,6 +204,10 @@ export class Mincho {
           const kMinWidthT_m = this.kMinWidthT - param_tate / 2;
           //head
           let poly_start = this.getStartOfVLine(x1, y1, x2, y2, a2, kMinWidthT_m, cv);
+          if (a2 == STARTTYPE.CONNECTING_MANUAL){
+            var r = get_rad(x1-x3, y1-y3) - get_rad(x2-x1, y2-y1) - Math.PI/2;
+            poly_start = this.getStartOfOffsetLine(x1, y1, dir, kMinWidthT_m, kMinWidthT_m * Math.tan(r), kMinWidthT_m * -Math.tan(r));
+          }
           //tail
           switch (a3) {
             case ENDTYPE.OPEN: {
@@ -308,6 +311,14 @@ export class Mincho {
 
 
       case STROKETYPE.CURVE: {
+
+        //for CONNECTING_MANUAL stroke (very very tricky implementation)
+        if (a2 == STARTTYPE.CONNECTING_MANUAL){
+          s[0] = s[0]-1//CURVE -> STRAIGHT
+          this.drawAdjustedStroke(cv, s, others)//treat as STRAIGHT line data
+          return
+        }
+
         const kMinWidthT_mod = this.kMinWidthT - ~~((s[1] % 10000) / 1000) / 2
         //head
         if (a2 == STARTTYPE.OPEN) {
@@ -641,6 +652,19 @@ export class Mincho {
       var temp = bez1[0].concat();//deep copy
       let b2 = bezier_to_y(temp.reverse(), y1);
       if (b2) { bez1[0] = b2.reverse(); }
+    } else if (40 <=a1 && a1 <= 80) {
+      var r = get_rad((x2pre - x1pre) * Math.pow(1.4, (a1%10) - 4.5), y2pre - y1pre)
+      if(a1 >= 50){
+        r = -r
+      }
+      if(a1 == 60){
+        r = Math.PI* 0.5 // vertical edge
+      }
+      let b1 = bezier_to_line(bez2[bez2.length - 1], x1, y1, r);
+      if (b1) { bez2[bez2.length - 1] = b1; }
+      var temp = bez1[0].concat();//deep copy
+      let b2 = bezier_to_line(temp.reverse(), x1, y1, r);
+      if (b2) { bez1[0] = b2.reverse(); }
     } else if (a1 == 22 && x1 != sx) {
       let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
       if (b1) { bez2[bez2.length - 1] = b1; }
@@ -754,6 +778,7 @@ export class Mincho {
       }
       [bez1, bez2] = Bezier.cBezier(x1, y1, sx1, sy1, sx2, sy2, x2, y2, width_func, width_func_d);
     }
+    //以下は今は実行されないコードだが実行時には2次ベジエのときと同様にdeep copyが必要か？
     if (a1 == 132 && x1 != sx1) {
       let b1 = bezier_to_y(bez2[bez2.length - 1], y1);
       if (b1) { bez2[bez2.length - 1] = b1; }

@@ -170,7 +170,30 @@ export function rad_to_vector(rad) {
 export function rad_to_dir(rad) {
   return {sin:  Math.sin(rad), cos: Math.cos(rad)};
 }
+/////////////////////////////////////////////////////
+export function bezier_to_line(bez, x0, y0, rad){
+  var rotate_mat_inv = [Math.cos(-rad), -Math.sin(-rad), Math.sin(-rad), Math.cos(-rad)]
+  function genten_rotate(p){
+    let [x,y] = p
+    var x1 = x-x0
+    var y1 = y-y0
+    return [rotate_mat_inv[0]*x1+rotate_mat_inv[1]*y1, rotate_mat_inv[2]*x1+rotate_mat_inv[3]*y1]
+  }
 
+  var rotate_mat = [Math.cos(rad), -Math.sin(rad), Math.sin(rad), Math.cos(rad)]
+  function genten_rotate_inv(p){
+    let [x,y] = p
+    return [rotate_mat[0]*x+rotate_mat[1]*y + x0, rotate_mat[2]*x+rotate_mat[3]*y + y0]
+  }
+  
+  var bezier_genten_rotated = bez.map(genten_rotate);
+  console.log(bezier_genten_rotated)
+  var bez_edited = bezier_to_y(bezier_genten_rotated, 0)
+  console.log(bez_edited)
+  var bez_edited_return = bez_edited.map(genten_rotate_inv)
+  bez_edited_return[0] = bez[0] //始点は変わらないはずなので誤差を防ぐため元の値を代入
+  return bez_edited_return;
+}
 function stretch_bezier_end(bez, t){
   const start = [bez[0][0],
                  bez[0][1]];
@@ -183,9 +206,12 @@ function stretch_bezier_end(bez, t){
   return [start, c1, c2, end];
 }
 export function bezier_to_y(bez, y){
-  const res = shorten_bezier_to_y(bez, y);
+  var res = shorten_bezier_to_y(bez, y);
   if(res){return res;}else{
-    return extend_bezier_to_y(bez, y);
+    res = extend_bezier_to_y(bez, y);
+    if(res){return res;}else{
+      return bez
+    }
   }
 }
 function extend_bezier_to_y(bez, y) {

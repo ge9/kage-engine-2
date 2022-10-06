@@ -18,7 +18,10 @@ export const STARTTYPE = {
     UPPER_RIGHT_CORNER : 22,//the starting point is at the upper right corner.  usually used for vertical lines, like the rightmost stroke of "日".
     CONNECTING_V : 32,//vertical strokes connecting to other strokes.  used in the center strokes of "工".
     THIN : 7,//used in the right stroke of "人"
-    ROOFED_THIN : 27//used in the right stroke of "入"
+    ROOFED_THIN : 27,//used in the right stroke of "入"
+    //////custom
+    CONNECTING_MANUAL: 39//the edge is cut in a certain direction; the degree is determined by hidden parameter. This shape is for straight line, but should be encoded as CURVE data
+    //40-60 is used for curve strokes
 }
 export const ENDTYPE = {
     // INTERNAL_LAST_FILLED_CIRCLE : 1,
