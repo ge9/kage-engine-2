@@ -30,6 +30,7 @@ export class FontCanvas {
           this.polygons.array[i].array[j].x = x2 - (this.polygons.array[i].array[j].x - x1);
           this.polygons.array[i].array[j].x = Math.floor(this.polygons.array[i].array[j].x * 10) / 10;
         }
+        this.polygons.array[i].array.reverse()
       }
     }
   }
@@ -48,6 +49,7 @@ export class FontCanvas {
           this.polygons.array[i].array[j].y = y2 - (this.polygons.array[i].array[j].y - y1);
           this.polygons.array[i].array[j].y = Math.floor(this.polygons.array[i].array[j].y * 10) / 10;
         }
+        this.polygons.array[i].array.reverse()
       }
     }
   }

@@ -187,9 +187,7 @@ export function bezier_to_line(bez, x0, y0, rad){
   }
   
   var bezier_genten_rotated = bez.map(genten_rotate);
-  console.log(bezier_genten_rotated)
   var bez_edited = bezier_to_y(bezier_genten_rotated, 0)
-  console.log(bez_edited)
   var bez_edited_return = bez_edited.map(genten_rotate_inv)
   bez_edited_return[0] = bez[0] //始点は変わらないはずなので誤差を防ぐため元の値を代入
   return bez_edited_return;
