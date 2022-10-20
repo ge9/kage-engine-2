@@ -11,8 +11,8 @@ export class Polygon{
   }
   push(x, y, off){ // void
     var temp = new Object();
-    temp.x = Math.round(x*10000)/10000;
-    temp.y = Math.round(y*10000)/10000;
+    temp.x = x;
+    temp.y = y;
     if(off != 1 && off != 2){
       off = 0;
     }
@@ -24,8 +24,8 @@ export class Polygon{
     this.push(x, y, off);
   }
   set(index, x, y, off){ // void
-    this.array[index].x = Math.round(x*10000)/10000;
-    this.array[index].y = Math.round(y*10000)/10000;
+    this.array[index].x = x;
+    this.array[index].y = y;
     if(off != 1 && off != 2){
       off = 0;
     }
@@ -48,8 +48,8 @@ export class Polygon{
   }
   unshift(x, y, off){ // void
     var temp = new Object();
-    temp.x = Math.round(x*10000)/10000;
-    temp.y = Math.round(y*10000)/10000;
+    temp.x = x;
+    temp.y = y;
     if(off != 1 && off != 2){
       off = 0;
     }

@@ -20,8 +20,10 @@ export const STARTTYPE = {
     THIN : 7,//used in the right stroke of "人"
     ROOFED_THIN : 27,//used in the right stroke of "入"
     //////custom
+    CONNECT_THIN: 37,
     CONNECTING_MANUAL: 39//the edge is cut in a certain direction; the degree is determined by hidden parameter. This shape is for straight line, but should be encoded as CURVE data
     //40-60 is used for curve strokes
+
 }
 export const ENDTYPE = {
     // INTERNAL_LAST_FILLED_CIRCLE : 1,
@@ -40,6 +42,6 @@ export const ENDTYPE = {
     TURN_LEFT : 4,//adds a short line to the left.  used in the rightmost stroke of "月".
     LOWER_RIGHT_HT : 24,//for characters used in China.
     TURN_UPWARDS : 5,//adds a short upward line.  used in the rightmost stroke of "札" or "風".
-    LEFT_SWEEP : 7, //used in the left stroke of "人".
+    LEFT_SWEEP : 7, //thin end; used in the left stroke of "人".
     STOP : 8,//used in the rightmost stroke of "小" or lower four dots of "魚".
 }

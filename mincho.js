@@ -1,5 +1,5 @@
 import { FontCanvas } from "./fontcanvas.js";
-import { get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y, bezier_to_line} from "./util.js";
+import { get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y, bezier_to_line, CURVE_THIN} from "./util.js";
 import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype.js";
 import { Bezier} from "./bezier.js";
 import { Polygon } from "./polygon.js";
@@ -191,9 +191,10 @@ export class Mincho {
           cv.drawLine(x1, y1, x2, y2, this.kMinWidthY);
           const urokoScale = (this.kMinWidthU / this.kMinWidthY - 1.0) / 4.0 + 1.0;
           if (y1 == y2) {//horizontal
-            const uroko_max = param_uroko == 0 ? param_uroko2 : param_uroko 
+            const uroko_max = Math.max(param_uroko, param_uroko2)
+            //const uroko_max = param_uroko == 0 ? param_uroko2 : param_uroko 
             //↑元の実装だとadjustUrokoによる調整がかかったものはadjustUroko2を一切通らないのでそれ以上小さくならない。
-            //実際には Math.max(param_uroko, param_uroko2) などのほうが合理的かも
+            //Math.max(param_uroko, param_uroko2) などのほうが合理的
             cv.drawUroko_h(x2, y2, this.kMinWidthY, this.kAdjustUrokoX[uroko_max] * urokoScale, this.kAdjustUrokoY[uroko_max] * urokoScale);
           } else {
             cv.drawUroko(x2, y2, dir, this.kMinWidthY, this.kAdjustUrokoX[param_uroko] * urokoScale, this.kAdjustUrokoY[param_uroko] * urokoScale);
@@ -632,7 +633,7 @@ export class Mincho {
         //don't feel like 'export'ing CURVE_THIN for this experimental change...
         width_func_d = t => {return (-0.628-30*Math.pow((1-t),29)*0.600)*kMinWidthT_mod};
       }
-      else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) {
+      else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN || a1 == STARTTYPE.CONNECT_THIN) {
         width_func = t => widfun(t, x1, y1, x2, y2, kMinWidthT_mod);
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, kMinWidthT_mod);
       }
@@ -683,7 +684,6 @@ export class Mincho {
       poly.push(x1, y1);
     }
     cv.addPolygon(poly);
-
     if(a2 == ENDTYPE.STOP){
       if(a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN){
         const bez1e = bez1[bez1.length - 1][3];
@@ -700,6 +700,10 @@ export class Mincho {
         const enddir = get_dir(x2-sx, y2-sy);
         cv.drawTailCircle(x2, y2, enddir, kMinWidthT_mod);
       }
+    }
+    if (a1 == STARTTYPE.CONNECT_THIN){
+      var dir_to_start = get_dir(x1-sx, y1-sy);
+      cv.drawTailCircle(x1, y1, dir_to_start, kMinWidthT_mod*CURVE_THIN);
     }
   }
 
@@ -764,7 +768,7 @@ export class Mincho {
         width_func = t => widfun(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
         width_func_d = t => widfun_d(t, x1, y1, x2, y2, kMinWidthT_mod) * this.kL2RDfatten;
       }
-      else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN) {
+      else if (a1 == STARTTYPE.THIN || a1 == STARTTYPE.ROOFED_THIN || a1 == STARTTYPE.CONNECT_THIN) {
         width_func = t => widfun_fat(t, x1, y1, x2, y2, kMinWidthT_mod);
         width_func_d = t => widfun_fat_d(t, x1, y1, x2, y2, kMinWidthT_mod);
       }
@@ -796,6 +800,11 @@ export class Mincho {
     poly.concat(Bezier.bez_to_poly(bez2));
     cv.addPolygon(poly);
 
+    if (a1 == STARTTYPE.CONNECT_THIN){
+      var dir_to_start = get_dir(x1-sx1, y1-sy1);
+      cv.drawTailCircle(x1, y1, dir_to_start, kMinWidthT_mod*CURVE_THIN);
+    }
+
     const bez1e = bez1[bez1.length - 1][3];
     const bez1c2 = bez1[bez1.length - 1][2];
 
@@ -803,6 +812,7 @@ export class Mincho {
     const bez2c1 = bez2[0][1];
     const tan1 = [bez1e[0] - bez1c2[0], bez1e[1] - bez1c2[1]];
     const tan2 = [bez2s[0] - bez2c1[0], bez2s[1] - bez2c1[1]];
+    
     return [tan1, tan2];
   }
 
@@ -986,7 +996,7 @@ export class Mincho {
     if (stroke[0] >= 100) return 0;
 
     //STROKETYPE.STRAIGHT && ENDTYPE.OPEN && y1==y2
-    var pressure = 0;
+    var pressures = [];
     for (let other of others) {
       if (
         (other[0] == 1 && other[4] == other[6] &&
@@ -996,9 +1006,10 @@ export class Mincho {
           !(stroke[3] + 1 > other[7] || stroke[5] - 1 < other[5]) &&
           Math.abs(stroke[4] - other[6]) < this.kAdjustUroko2Length)
       ) {
-        pressure += Math.pow(this.kAdjustUroko2Length - Math.abs(stroke[4] - other[6]), 1.1);
+        pressures.push(Math.pow(this.kAdjustUroko2Length - Math.abs(stroke[4] - other[6]), 1.1));
       }
     }
+    var pressure = pressures.reduce((acc, val) => Math.max(acc, val), 0)*1.1//1.1を取ってmaxではなく+にすると以前と同じ
     var result = Math.min(Math.floor(pressure / this.kAdjustUroko2Length), this.kAdjustUroko2Step);
     return result;//a3 += res * 100;
   }
@@ -1036,19 +1047,24 @@ export class Mincho {
     //STROKETYPE.BENDING
     //applied only if y2=y3
     if (stroke[6] != stroke[8]) return 0;
-    var res = 0;
+    var res0 = [];
     for (let other of others) {
+      const other_y_mod = other[4] + 7
       if (
         (other[0] == 1 && other[4] == other[6] &&
           !(stroke[5] + 1 > other[5] || stroke[7] - 1 < other[3]) &&
-          Math.abs(stroke[6] - other[4]) < this.kMinWidthT * this.kAdjustMageStep) ||
+          Math.abs(stroke[6] - other_y_mod) < this.kMinWidthT * this.kAdjustMageStep) ||
         (other[0] == 3 && other[6] == other[8] &&
           !(stroke[5] + 1 > other[7] || stroke[7] - 1 < other[5]) &&
-          Math.abs(stroke[6] - other[6]) < this.kMinWidthT * this.kAdjustMageStep)
+          Math.abs(stroke[6] - other_y_mod) < this.kMinWidthT * this.kAdjustMageStep)
       ) {
-        res += this.kAdjustMageStep - Math.floor(Math.abs(stroke[6] - other[6]) / this.kMinWidthT);
+        res0.push(this.kAdjustMageStep - Math.floor((Math.abs(stroke[6] - other_y_mod)+2) / this.kMinWidthT));
       }
     }
+    var res = res0.reduce((acc, val) => Math.max(acc, val), 0)*1.3//1.3を外してmaxではなく+にすると以前と同じ
+    const maxlen = (stroke[6] - stroke[4]) * 0.6//y2-y1から算出
+    const res2 = maxlen <= 0 ? 0 : (1 - (maxlen/this.kWidth - 1)/4 ) * this.kAdjustMageStep//"this.kWidth * (4 * (1 - param_mage / this.kAdjustMageStep) + 1)" を参考に逆算
+    res = Math.max(res,res2)//小数値が返るため、問題が出る可能性もある？今のところ問題なし
     res = Math.min(res, this.kAdjustMageStep);
     return res;//a3 += res * 1000;
   }

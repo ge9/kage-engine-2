@@ -1,6 +1,6 @@
 export const bez_cir = 4*(Math.sqrt(2)-1)/3;
 //a constant for drawing circles with Bezier curves
-const CURVE_THIN = 0.1910
+export const CURVE_THIN = 0.1910
 //width functions (using the first quadrant of circle of radius p, centered at (1-p, 1-p) )
 export function widfun(t, x1, y1, x2, y2, wid){
   const len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
