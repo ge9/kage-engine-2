@@ -204,13 +204,42 @@ function stretch_bezier_end(bez, t){
   return [start, c1, c2, end];
 }
 export function bezier_to_y(bez, y){
-  var res = shorten_bezier_to_y(bez, y);
-  if(res){return res;}else{
-    res = extend_bezier_to_y(bez, y);
-    if(res){return res;}else{
-      return bez
+  const a =     bez[3][1] - 3 * bez[2][1] + 3 * bez[1][1] - bez[0][1];
+  const b = 3 * bez[2][1] - 6 * bez[1][1] + 3 * bez[0][1];
+  const c = 3 * bez[1][1] - 3 * bez[0][1];
+  const d =     bez[0][1];
+  const yy = solveCubic(a, b, c, d - y);
+  const ext = get_extreme_points(a, b, c);
+  function hit_extreme(x1, x2){
+    for (let e of ext){
+      if (x1 < e && e < x2) return true;
+    }
+    return false;
+  }
+  yy.sort(function (a, b) {//descending order
+    return b - a;
+  });
+  for (let i of yy) {
+    if (0 < i && i < 1) {
+      return stretch_bezier_end(bez, i);
     }
   }
+  
+  yy.reverse()//ascending order
+  for (let i of yy) {
+    if (i > 1) {
+      if(!hit_extreme(1, i)) return stretch_bezier_end(bez, i);
+    }
+  }
+  return bez;
+
+  //var res = shorten_bezier_to_y(bez, y);
+  //if(res){return res;}else{
+  //  res = extend_bezier_to_y(bez, y);
+  //  if(res){return res;}else{
+  //    return bez
+  //  }
+  //}
 }
 function extend_bezier_to_y(bez, y) {
   const a =     bez[3][1] - 3 * bez[2][1] + 3 * bez[1][1] - bez[0][1];
@@ -245,7 +274,21 @@ function shorten_bezier_to_y(bez, y) {
   }
   return false;
 }
-
+function get_extreme_points(a0, b0, c0){
+ let a = a0*3;
+ let b = b0*2;
+ let c = c0;
+ let d = b * b - (4 * a * c);
+ if(d > 0){
+    let x1 = ((-1) * b + Math.sqrt(d)) / (2 * a);
+    let x2 = ((-1) * b - Math.sqrt(d)) / (2 * a);
+    return [x1, x2]
+ } else if(d == 0) {
+    return [(-1) * b / (2 * a)]
+ } else {
+    return []
+ }
+}
 function solveCubic(a, b, c, d) {
   if (Math.abs(a) < 1e-8) { // Quadratic case, ax^2+bx+c=0
       a = b; b = c; c = d;

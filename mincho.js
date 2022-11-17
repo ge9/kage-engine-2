@@ -360,9 +360,14 @@ export class Mincho {
             break;
           }
           default: {
-            if ((a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) && a3 == ENDTYPE.OPEN) {
-              cv.drawL2RSweepEnd(x3, y3, dir23, kMinWidthT_mod, this.kL2RDfatten);
+            if (a3 == ENDTYPE.OPEN){
+              if (a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) {
+                cv.drawL2RSweepEnd(x3, y3, dir23, kMinWidthT_mod, this.kL2RDfatten);
+              }else if(a2 == STARTTYPE.CONNECT_THIN){
+                cv.drawL2RSweepEnd(x3, y3, dir23, kMinWidthT_mod, 1);
+              }
             }
+
             break;
           }
         }
@@ -524,7 +529,11 @@ export class Mincho {
             break;
           case ENDTYPE.STOP:
             let [x4ex, y4ex] = moved_point(x4, y4, dir34, -kMinWidthT_mod * 0.52);
-            cv.drawTailCircle_tan(x4ex, y4ex, dir34, kMinWidthT_mod*1.1, tan1, tan2);
+            if(a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN){
+              cv.drawTailCircle_tan(x4ex, y4ex, dir34, kMinWidthT_mod*1.1, tan1, tan2);
+            }else{//CONNECT_THIN
+              cv.drawTailCircle(x4ex, y4ex, dir34, kMinWidthT_mod);
+            }
             break;
           default:
             if ((a2 == STARTTYPE.THIN || a2 == STARTTYPE.ROOFED_THIN) && a3 == ENDTYPE.OPEN) {
@@ -696,7 +705,7 @@ export class Mincho {
       const cent_y = (y1 + 4*sy + y2) / 6;
       var rad_end = get_dir(x2-cent_x, y2-cent_y);
        cv.drawTailCircle_tan(x2, y2, rad_end, kMinWidthT_mod*1.1*thin_stop_param, tan1, tan2);
-      }else{
+      }else{//CONNECT_THIN
         const enddir = get_dir(x2-sx, y2-sy);
         cv.drawTailCircle(x2, y2, enddir, kMinWidthT_mod);
       }
