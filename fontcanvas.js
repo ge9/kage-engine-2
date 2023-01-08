@@ -146,8 +146,8 @@ export class FontCanvas {
   drawUpperRightCorner2(x1, y1, kMinWidthT, kagekMinWidthY, kagekWidth, is_roofed_thin) {
     var p = new PointMaker(x1, y1);
     var poly = new Polygon();
-    //poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
-    poly.push2(p.vec(-kMinWidthT*1.2,-kagekMinWidthY));
+    poly.push2(p.vec(-kMinWidthT,-kagekMinWidthY));
+    //poly.push2(p.vec(-kMinWidthT*1.2,-kagekMinWidthY));
 
     poly.push2(p.vec(0,-kagekMinWidthY - kagekWidth));
     //poly.push2(p.vec(-kMinWidthT*0.1,-kagekMinWidthY - kagekWidth*1.1));

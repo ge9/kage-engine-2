@@ -1,5 +1,5 @@
 import { FontCanvas } from "./fontcanvas.js";
-import { get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y, bezier_to_line, CURVE_THIN} from "./util.js";
+import { norm2, get_dir, get_rad, rad_to_dir, moved_point, get_extended_dest , widfun, widfun_d, widfun_stop, widfun_stop_d, widfun_fat, widfun_fat_d, DIR_POSX, DIR_NEGX, bezier_to_y, bezier_to_line, CURVE_THIN} from "./util.js";
 import { STROKETYPE, STARTTYPE, ENDTYPE} from "./stroketype.js";
 import { Bezier} from "./bezier.js";
 import { Polygon } from "./polygon.js";
@@ -69,12 +69,10 @@ export class Mincho {
       this.kL2RDfatten = 1.2;
       this.kMage = size * 4 + 2;
 
-      this.kAdjustKakatoL = ([size * 6 + 1, size * 5 + 1, size * 4 + 1, size * 3+0.75, size * 2 + 0.5, size * 1 + 0.25]); // for KAKATO adjustment 000,100,200,300,400
-      this.kAdjustKakatoR = ([6,4,2,0]); // for KAKATO adjustment 000,100,200,300
-      this.kAdjustKakatoR[-1] = 8
-      this.kAdjustKakatoR[-2] = 10
-      this.kAdjustKakatoRangeX = 26; // check area width
-      this.kAdjustKakatoRangeY = ([11, 13, 15, 17, 19, 21]); // 3 steps of checking
+      this.kAdjustKakatoL = ([14, 11, 8, 6, 4, 2]); // for KAKATO adjustment 000,100,200,300,400
+      this.kAdjustKakatoR = ([8, 6.5, 5, 4.5, 3, 2]); // for KAKATO adjustment 000,100,200,300
+      this.kAdjustKakatoRangeX = 20; // check area width
+      this.kAdjustKakatoRangeY = ([3, 9, 15, 21, 27, 32]); // 5 steps of checking
       this.kAdjustKakatoStep = 5; // number of steps
 
       this.kAdjustUrokoX = ([size * 9.5 + 4, size * 8 + 3.5, size * 6.5 + 3, size * 5 + 2.5]); // for UROKO adjustment 000,100,200,300
@@ -97,17 +95,17 @@ export class Mincho {
       this.kL2RDfatten = 1.1;
       this.kMage = 10;
 
-      this.kAdjustKakatoL = ([14, 9, 5, 2]); // for KAKATO adjustment 000,100,200,300,400
-      this.kAdjustKakatoR = ([8, 6, 4, 2]); // for KAKATO adjustment 000,100,200,300
+      this.kAdjustKakatoL = ([14, 11, 8, 5, 3, 2]); // for KAKATO adjustment
+      this.kAdjustKakatoR = ([10,  8, 6, 4, 3, 2]); // for KAKATO adjustment
       this.kAdjustKakatoRangeX = 20; // check area width
-      this.kAdjustKakatoRangeY = ([1, 19, 24, 30]); // 3 steps of checking
-      this.kAdjustKakatoStep = 3; // number of steps
+      this.kAdjustKakatoRangeY = ([1, 11, 18, 24, 30, 35]); // 3 steps of checking
+      this.kAdjustKakatoStep = 5; // number of steps
 
-      this.kAdjustUrokoX = ([24, 20, 16, 12]); // for UROKO adjustment 000,100,200,300
-      this.kAdjustUrokoY = ([12, 11, 9, 8]); // for UROKO adjustment 000,100,200,300
-      this.kAdjustUrokoLength = ([22, 36, 50]); // length for checking
-      this.kAdjustUrokoLengthStep = 3; // number of steps
-      this.kAdjustUrokoLine = ([22, 26, 30]); // check for crossing. corresponds to length
+      this.kAdjustUrokoX = ([24, 21, 18, 16, 14, 12]); // for UROKO adjustment 000,100,200,300
+      this.kAdjustUrokoY = ([12, 11, 10, 9, 8.5, 8]); // for UROKO adjustment 000,100,200,300
+      this.kAdjustUrokoLength = ([22, 28, 34, 41, 48, 55]); // length for checking
+      this.kAdjustUrokoLengthStep = 5; // number of steps
+      this.kAdjustUrokoLine = ([18, 20, 23, 26, 30, 35]); // check for crossing. corresponds to length
 
       this.kAdjustUroko2Step = 3;
       this.kAdjustUroko2Length = 40;
@@ -191,7 +189,7 @@ export class Mincho {
           cv.drawLine(x1, y1, x2, y2, this.kMinWidthY);
           const urokoScale = (this.kMinWidthU / this.kMinWidthY - 1.0) / 4.0 + 1.0;
           if (y1 == y2) {//horizontal
-            const uroko_max = Math.max(param_uroko, param_uroko2)
+            const uroko_max = Math.floor(norm2(param_uroko, param_uroko2))
             //const uroko_max = param_uroko == 0 ? param_uroko2 : param_uroko 
             //↑元の実装だとadjustUrokoによる調整がかかったものはadjustUroko2を一切通らないのでそれ以上小さくならない。
             //Math.max(param_uroko, param_uroko2) などのほうが合理的
@@ -252,14 +250,17 @@ export class Mincho {
                 }
                 cv.drawNewGTHbox(x2 + m, y2, kMinWidthT_m, this.kMinWidthY);
               }
+              //in the original implementation, opt2 is calculated to 413 % 100 = 4, and kAdjustKakatoL[4] is manually set to 0. 
+              //The appearance is typically remedied by the crossing horizontal line.
               const right2 = kMinWidthT_m;
               const left2 = 0;
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
             }
             case ENDTYPE.LOWER_LEFT_ZH_OLD: {
-              const right2 = this.kAdjustKakatoL[3] + kMinWidthT_m;
-              const left2 = this.kAdjustKakatoL[3];
+              //in the original implementation, opt2 is calculated to 313 % 100 = 3, corresponding to (original) kAdjustKakatoStep.
+              const right2 = this.kAdjustKakatoL[this.kAdjustKakatoStep] + kMinWidthT_m;
+              const left2 = this.kAdjustKakatoL[this.kAdjustKakatoStep];
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
             }
@@ -959,15 +960,18 @@ export class Mincho {
     
     //(STROKETYPE.STRAIGHT || STROKETYPE.BENDING || STROKETYPE.VCURVE)
     if (stroke[3] != stroke[5]) return 0;
-    var res = 0;
+    var res_arr = [];
     for (let other of others) {
       if ((other[0] == 1 || other[0] == 3 || other[0] == 7) && other[3] == other[5] &&
         !(stroke[4] + 1 > other[6] || stroke[6] - 1 < other[4]) &&
         Math.abs(stroke[3] - other[3]) < this.kMinWidthT * this.kAdjustTateStep) {
-        res += (this.kAdjustTateStep - Math.floor(Math.abs(stroke[3] - other[3]) / this.kMinWidthT));
+        res_arr.push(this.kAdjustTateStep - Math.floor(Math.abs(stroke[3] - other[3]) / this.kMinWidthT));
       }
     }
-    res = Math.min(res, this.kAdjustTateStep);
+    const kAdjustTateStep_org = 4;//original implementation
+    var res = res_arr.reduce((acc, val) => norm2(acc, val), 0)*1.1//1.1を取ってnorm2ではなく+にすると以前と同じ
+    
+    res = Math.min(res, kAdjustTateStep_org);
     return res;//a2 += res * 1000
   }
 
@@ -1018,7 +1022,7 @@ export class Mincho {
         pressures.push(Math.pow(this.kAdjustUroko2Length - Math.abs(stroke[4] - other[6]), 1.1));
       }
     }
-    var pressure = pressures.reduce((acc, val) => Math.max(acc, val), 0)*1.1//1.1を取ってmaxではなく+にすると以前と同じ
+    var pressure = pressures.reduce((acc, val) => norm2(acc, val), 0)*1.7//1.7を取ってnorm2ではなく+にすると以前と同じ
     var result = Math.min(Math.floor(pressure / this.kAdjustUroko2Length), this.kAdjustUroko2Step);
     return result;//a3 += res * 100;
   }
@@ -1070,7 +1074,7 @@ export class Mincho {
         res0.push(this.kAdjustMageStep - Math.floor((Math.abs(stroke[6] - other_y_mod)+2) / this.kMinWidthT));
       }
     }
-    var res = res0.reduce((acc, val) => Math.max(acc, val), 0)*1.3//1.3を外してmaxではなく+にすると以前と同じ
+    var res = res0.reduce((acc, val) => norm2(acc, val), 0)*1.2//1.2を外してnorm2ではなく+にすると以前と同じ
     const maxlen = (stroke[6] - stroke[4]) * 0.6//y2-y1から算出
     const res2 = maxlen <= 0 ? 0 : (1 - (maxlen/this.kWidth - 1)/4 ) * this.kAdjustMageStep//"this.kWidth * (4 * (1 - param_mage / this.kAdjustMageStep) + 1)" を参考に逆算
     res = Math.max(res,res2)//小数値が返るため、問題が出る可能性もある？今のところ問題なし
@@ -1114,7 +1118,7 @@ export class Mincho {
         | stroke[6] + this.kAdjustKakatoRangeY[k + 1] > 200 // adjust for baseline
         | stroke[6] - stroke[4] < this.kAdjustKakatoRangeY[k + 1] // for thin box
       ) {
-        return (3 - k);
+        return (this.kAdjustKakatoStep - k);
       }
     }
     return 0;
