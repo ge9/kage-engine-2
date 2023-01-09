@@ -96,18 +96,18 @@ export class Mincho {
       this.kMage = 10;
 
       this.kAdjustKakatoL = ([14, 11, 8, 5, 3, 2]); // for KAKATO adjustment
-      this.kAdjustKakatoR = ([10,  8, 6, 4, 3, 2]); // for KAKATO adjustment
+      this.kAdjustKakatoR = ([10,  8, 6, 4, 2, 1]); // for KAKATO adjustment
       this.kAdjustKakatoRangeX = 20; // check area width
-      this.kAdjustKakatoRangeY = ([1, 11, 18, 24, 30, 35]); // 3 steps of checking
+      this.kAdjustKakatoRangeY = ([1, 14, 19, 24, 29, 35]); //[0]は0以上[1]以下であればなんでもよい？
       this.kAdjustKakatoStep = 5; // number of steps
 
       this.kAdjustUrokoX = ([24, 21, 18, 16, 14, 12]); // for UROKO adjustment 000,100,200,300
       this.kAdjustUrokoY = ([12, 11, 10, 9, 8.5, 8]); // for UROKO adjustment 000,100,200,300
-      this.kAdjustUrokoLength = ([22, 28, 34, 41, 48, 55]); // length for checking
+      this.kAdjustUrokoLength = ([16, 23, 30, 38, 46, 55]); // length for checking
       this.kAdjustUrokoLengthStep = 5; // number of steps
       this.kAdjustUrokoLine = ([18, 20, 23, 26, 30, 35]); // check for crossing. corresponds to length
 
-      this.kAdjustUroko2Step = 3;
+      this.kAdjustUroko2Step = 5;//max value
       this.kAdjustUroko2Length = 40;
 
       this.kAdjustTateStep = 4;
@@ -1060,21 +1060,30 @@ export class Mincho {
     //STROKETYPE.BENDING
     //applied only if y2=y3
     if (stroke[6] != stroke[8]) return 0;
-    var res0 = [];
+    var res0_above = [];
+    var res0_below = [];
     for (let other of others) {
-      const other_y_mod = other[4] + 7
       if (
         (other[0] == 1 && other[4] == other[6] &&
           !(stroke[5] + 1 > other[5] || stroke[7] - 1 < other[3]) &&
-          Math.abs(stroke[6] - other_y_mod) < this.kMinWidthT * this.kAdjustMageStep) ||
+          Math.abs(stroke[6] - other[4]) < this.kMinWidthT * this.kAdjustMageStep) ||
         (other[0] == 3 && other[6] == other[8] &&
           !(stroke[5] + 1 > other[7] || stroke[7] - 1 < other[5]) &&
-          Math.abs(stroke[6] - other_y_mod) < this.kMinWidthT * this.kAdjustMageStep)
+          Math.abs(stroke[6] - other[4]) < this.kMinWidthT * this.kAdjustMageStep)
       ) {
-        res0.push(this.kAdjustMageStep - Math.floor((Math.abs(stroke[6] - other_y_mod)+2) / this.kMinWidthT));
+        var p = this.kAdjustMageStep - Math.floor(Math.abs(stroke[6] - other[4]) / this.kMinWidthT);
+        if (stroke[6] < other[4]) //lines "above" the hane
+        {
+          res0_above.push(p);
+        }else{
+          res0_below.push(p);
+        }
       }
     }
-    var res = res0.reduce((acc, val) => norm2(acc, val), 0)*1.2//1.2を外してnorm2ではなく+にすると以前と同じ
+    var res_above = res0_above.reduce((acc, val) => Math.max(acc, val), 0)*0.9
+    var res_below = res0_below.reduce((acc, val) => Math.max(acc, val), 0)*1.3
+    var res = Math.max(res_above, res_below)//1.3とかを外して上2行を含めたmaxとかnorm2を+にすると以前と同じ
+    
     const maxlen = (stroke[6] - stroke[4]) * 0.6//y2-y1から算出
     const res2 = maxlen <= 0 ? 0 : (1 - (maxlen/this.kWidth - 1)/4 ) * this.kAdjustMageStep//"this.kWidth * (4 * (1 - param_mage / this.kAdjustMageStep) + 1)" を参考に逆算
     res = Math.max(res,res2)//小数値が返るため、問題が出る可能性もある？今のところ問題なし
