@@ -88,14 +88,35 @@ export class Mincho {
       this.kAdjustMageStep = 5;
     } else {
       this.kMinWidthY = 2;
+      this.kMinWidthYY = 2;//横線の太さのみを決める。kMinWidthY以上の値が望ましい
+      //this.kMinWidthYY *= 1.1;
       this.kMinWidthU = 2;
       this.kMinWidthT = 6;
+      //this.kMinWidthT = 5.7;
+      this.kMinWidthC = 1;//開放・左下右下カドの傾きを決める。1なら元と同じ
+      //this.kMinWidthC *= 0.8;
       this.kWidth = 5;
       this.kKakato = 3;
       this.kL2RDfatten = 1.1;
       this.kMage = 10;
 
-      this.kAdjustKakatoL = ([14, 11, 8, 5, 3, 2]); // for KAKATO adjustment
+      //light用
+      //this.kMinWidthYY *= 0.9;
+      //this.kMinWidthT *= 0.85;
+      
+      //medium用
+      
+      //this.kMinWidthU *= 1.3;
+      //this.kMinWidthYY *= 1.1;
+      //this.kMinWidthT *= 1.16;
+      /*
+      //bold用（曲線に課題あり）
+      this.kMinWidthU *= 1.6;
+      this.kMinWidthYY *= 1.2;
+      this.kMinWidthT *= 1.33;
+      */
+
+      this.kAdjustKakatoL = ([12, 9.6, 7.3, 5, 3, 2]); // for KAKATO adjustment
       this.kAdjustKakatoR = ([10,  8, 6, 4, 2, 1]); // for KAKATO adjustment
       this.kAdjustKakatoRangeX = 20; // check area width
       this.kAdjustKakatoRangeY = ([1, 14, 19, 24, 29, 35]); //[0]は0以上[1]以下であればなんでもよい？
@@ -182,20 +203,20 @@ export class Mincho {
       case STROKETYPE.STRAIGHT: {
         const dir = get_dir(x2-x1, y2-y1);
         if (a3 == ENDTYPE.CONNECTING_H) {//usually horizontal
-          cv.drawLine(x1, y1, x2, y2, this.kMinWidthY);
+          cv.drawLine(x1, y1, x2, y2, this.kMinWidthYY);
         } else if (a3 == ENDTYPE.OPEN && Math.abs(y2 - y1) < x2 - x1) { //horizontal or gentle slope
           const param_uroko = this.adjustUrokoParam(s, others);
           const param_uroko2 = this.adjustUroko2Param(s, others);
-          cv.drawLine(x1, y1, x2, y2, this.kMinWidthY);
+          cv.drawLine(x1, y1, x2, y2, this.kMinWidthYY);
           const urokoScale = (this.kMinWidthU / this.kMinWidthY - 1.0) / 4.0 + 1.0;
           if (y1 == y2) {//horizontal
             const uroko_max = Math.floor(norm2(param_uroko, param_uroko2))
             //const uroko_max = param_uroko == 0 ? param_uroko2 : param_uroko 
             //↑元の実装だとadjustUrokoによる調整がかかったものはadjustUroko2を一切通らないのでそれ以上小さくならない。
             //Math.max(param_uroko, param_uroko2) などのほうが合理的
-            cv.drawUroko_h(x2, y2, this.kMinWidthY, this.kAdjustUrokoX[uroko_max] * urokoScale, this.kAdjustUrokoY[uroko_max] * urokoScale);
+            cv.drawUroko_h(x2, y2, this.kMinWidthYY, this.kAdjustUrokoX[uroko_max] * urokoScale, this.kAdjustUrokoY[uroko_max] * urokoScale);
           } else {
-            cv.drawUroko(x2, y2, dir, this.kMinWidthY, this.kAdjustUrokoX[param_uroko] * urokoScale, this.kAdjustUrokoY[param_uroko] * urokoScale);
+            cv.drawUroko(x2, y2, dir, this.kMinWidthYY, this.kAdjustUrokoX[param_uroko] * urokoScale, this.kAdjustUrokoY[param_uroko] * urokoScale);
           }
         } else {//vertical or steep slope
           let poly_end = new Polygon(2);
@@ -210,8 +231,8 @@ export class Mincho {
           //tail
           switch (a3) {
             case ENDTYPE.OPEN: {
-              const right2 = kMinWidthT_m / 2;
-              const left2 = -kMinWidthT_m / 2;
+              const right2 = this.kMinWidthC * kMinWidthT_m / 2;
+              const left2 = this.kMinWidthC * -kMinWidthT_m / 2;
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
             }
@@ -228,14 +249,14 @@ export class Mincho {
             }
             case ENDTYPE.LOWER_LEFT_CORNER: {
               const param_kakato = this.adjustKakatoParam(s, others);
-              const right2 = this.kAdjustKakatoL[param_kakato] + kMinWidthT_m;
+              const right2 = this.kAdjustKakatoL[param_kakato] + this.kMinWidthC * kMinWidthT_m;
               const left2 = this.kAdjustKakatoL[param_kakato];
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
             }
             case ENDTYPE.LOWER_RIGHT_CORNER: {
               const param_kakato = this.adjustKakatoParam(s, others);
-              const right2 = this.kAdjustKakatoR[param_kakato] + kMinWidthT_m;
+              const right2 = this.kAdjustKakatoR[param_kakato] + this.kMinWidthC * kMinWidthT_m;
               const left2 = this.kAdjustKakatoR[param_kakato];
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
@@ -252,14 +273,14 @@ export class Mincho {
               }
               //in the original implementation, opt2 is calculated to 413 % 100 = 4, and kAdjustKakatoL[4] is manually set to 0. 
               //The appearance is typically remedied by the crossing horizontal line.
-              const right2 = kMinWidthT_m;
+              const right2 = this.kMinWidthC * kMinWidthT_m;
               const left2 = 0;
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
             }
             case ENDTYPE.LOWER_LEFT_ZH_OLD: {
               //in the original implementation, opt2 is calculated to 313 % 100 = 3, corresponding to (original) kAdjustKakatoStep.
-              const right2 = this.kAdjustKakatoL[this.kAdjustKakatoStep] + kMinWidthT_m;
+              const right2 = this.kAdjustKakatoL[this.kAdjustKakatoStep] + this.kMinWidthC * kMinWidthT_m;
               const left2 = this.kAdjustKakatoL[this.kAdjustKakatoStep];
               poly_end = this.getEndOfOffsetLine(x1, y1, x2, y2, kMinWidthT_m, right2, left2);
               break;
@@ -335,7 +356,7 @@ export class Mincho {
           cv.drawUpperRightCorner2(x1, y1, kMinWidthT_mod, this.kMinWidthY, this.kWidth, a2 == STARTTYPE.ROOFED_THIN);
         } else if (a2 == STARTTYPE.UPPER_LEFT_CORNER) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, -this.kMinWidthY);
-          cv.drawUpperLeftCorner(x1ext, y1ext, dir12, kMinWidthT_mod);
+          cv.drawUpperLeftCorner(x1ext, y1ext, dir12, kMinWidthT_mod);//this.kMinWidthC * ?
         }
         //body
         const a2temp = (a2 == STARTTYPE.CONNECTING_V && this.adjustKirikuchiParam(s, others)) ? 100 + a2 : a2;
@@ -855,10 +876,10 @@ export class Mincho {
       }
       poly_start = this.getStartOfOffsetLine(x1, y1, dir, kMinWidthT, right1, left1);
       if (a1 == 22) { //box's right top corner
-        cv.drawUpperRightCorner_straight_v(x1, y1, kMinWidthT, this.kMinWidthY, this.kWidth);
+        cv.drawUpperRightCorner_straight_v(x1, y1, kMinWidthT, this.kMinWidthYY, this.kWidth);
       }
       if (a1 == 0) { //beginning of the stroke
-        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthY, rad);
+        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthYY, rad);
       }
     } else {
       const v = 1 //previously (x1 > x2) ? -1 : 1;
@@ -900,10 +921,10 @@ export class Mincho {
         poly_start = this.getStartOfOffsetLine(x1, y1, dir, kMinWidthT, right1, left1);
       }
       if (a1 == 22) { //SHIKAKU MIGIUE UROKO NANAME DEMO MASSUGU MUKI
-        cv.drawUpperRightCorner(x1, y1, kMinWidthT, this.kMinWidthY, this.kWidth);
+        cv.drawUpperRightCorner(x1, y1, kMinWidthT, this.kMinWidthYY, this.kWidth);
       }
       if (a1 == 0) { //beginning of the stroke
-        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthY, rad);
+        cv.drawOpenBegin_straight(x1, y1, kMinWidthT, this.kMinWidthYY, rad);
       }
     }
     return poly_start;
@@ -1022,7 +1043,7 @@ export class Mincho {
         pressures.push(Math.pow(this.kAdjustUroko2Length - Math.abs(stroke[4] - other[6]), 1.1));
       }
     }
-    var pressure = pressures.reduce((acc, val) => norm2(acc, val), 0)*1.7//1.7を取ってnorm2ではなく+にすると以前と同じ
+    var pressure = pressures.reduce((acc, val) => norm2(acc, val), 0)*1.9//1.7を取ってnorm2ではなく+にすると以前と同じ
     var result = Math.min(Math.floor(pressure / this.kAdjustUroko2Length), this.kAdjustUroko2Step);
     return result;//a3 += res * 100;
   }
@@ -1069,10 +1090,10 @@ export class Mincho {
           Math.abs(stroke[6] - other[4]) < this.kMinWidthT * this.kAdjustMageStep) ||
         (other[0] == 3 && other[6] == other[8] &&
           !(stroke[5] + 1 > other[7] || stroke[7] - 1 < other[5]) &&
-          Math.abs(stroke[6] - other[4]) < this.kMinWidthT * this.kAdjustMageStep)
+          Math.abs(stroke[6] - other[6]) < this.kMinWidthT * this.kAdjustMageStep)
       ) {
-        var p = this.kAdjustMageStep - Math.floor(Math.abs(stroke[6] - other[4]) / this.kMinWidthT);
-        if (stroke[6] < other[4]) //lines "above" the hane
+        var p = this.kAdjustMageStep - Math.floor(Math.abs(stroke[6] - other[6]) / this.kMinWidthT);
+        if ((other[0] == 1 && stroke[6] < other[4]) || (other[0] == 3 && stroke[6] < other[6])) //lines "above" the hane
         {
           res0_above.push(p);
         }else{
@@ -1080,7 +1101,7 @@ export class Mincho {
         }
       }
     }
-    var res_above = res0_above.reduce((acc, val) => Math.max(acc, val), 0)*0.9
+    var res_above = res0_above.reduce((acc, val) => Math.max(acc, val), 0)
     var res_below = res0_below.reduce((acc, val) => Math.max(acc, val), 0)*1.3
     var res = Math.max(res_above, res_below)//1.3とかを外して上2行を含めたmaxとかnorm2を+にすると以前と同じ
     
