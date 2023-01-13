@@ -28,10 +28,10 @@ export class Bezier{
       tang1.push(rad_to_vector(rad-width_rad));
       tang2.push(rad_to_vector(rad+width_rad-Math.PI));
     }
-    const bez1 = fitCubic_tang(a1, tang1, 0.03);
-    const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
-    //const bez1 = fitCurve(a1, 0.03);
-    //const bez2 = fitCurve(a2.reverse(), 0.03);
+    //const bez1 = fitCubic_tang(a1, tang1, 0.03);
+    //const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
+    const bez1 = fitCurve(a1, 0.03);
+    const bez2 = fitCurve(a2.reverse(), 0.03);
     return [bez1, bez2];
   }
   static generalBezier2(x_fun, y_fun, dx_fun, dy_fun, width_func, width_func_d, dir_func){
@@ -60,10 +60,10 @@ export class Bezier{
       tang1.push(rad_to_vector(rad-width_rad));
       tang2.push(rad_to_vector(rad+width_rad-Math.PI));
     }
-    const bez1 = fitCubic_tang(a1, tang1, 0.03);
-    const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
-    //const bez1 = fitCurve(a1, 0.03);
-    //const bez2 = fitCurve(a2.reverse(), 0.03);
+    //const bez1 = fitCubic_tang(a1, tang1, 0.03);
+    //const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
+    const bez1 = fitCurve(a1, 0.03);
+    const bez2 = fitCurve(a2.reverse(), 0.03);
     return [bez1, bez2];
   }
 
@@ -131,10 +131,10 @@ export class Bezier{
       tang1.push([ Math.cos(rad1)*ex-Math.sin(rad1)*ey,  Math.sin(rad1)*ex+Math.cos(rad1)*ey]);
       tang2.push([-Math.cos(rad2)*ex+Math.sin(rad2)*ey, -Math.sin(rad2)*ex-Math.cos(rad2)*ey]);
     }
-    const bez1 = fitCubic_tang(a1, tang1, 0.03);
-    const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
-    //const bez1 = fitCurve(a1, 0.01);
-    //const bez2 = fitCurve(a2.reverse(), 0.01);
+    //const bez1 = fitCubic_tang(a1, tang1, 0.03);
+    //const bez2 = fitCubic_tang(a2.reverse(), tang2.reverse(), 0.03);
+    const bez1 = fitCurve(a1, 0.01);
+    const bez2 = fitCurve(a2.reverse(), 0.01);
     return [bez1, bez2];
   }
 

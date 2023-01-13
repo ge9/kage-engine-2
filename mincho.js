@@ -89,9 +89,10 @@ export class Mincho {
     } else {
       this.kMinWidthY = 2;
       this.kMinWidthYY = 2;//横線の太さのみを決める。kMinWidthY以上の値が望ましい
-      //this.kMinWidthYY *= 1.1;
+      //this.kMinWidthYY *= 1.2;
       this.kMinWidthU = 2;
       this.kMinWidthT = 6;
+      this.kMinWidthT_adjust = 6;//use consistent parameter for adjustment
       //this.kMinWidthT = 5.7;
       this.kMinWidthC = 1;//開放・左下右下カドの傾きを決める。1なら元と同じ
       //this.kMinWidthC *= 0.8;
@@ -101,14 +102,17 @@ export class Mincho {
       this.kMage = 10;
 
       //light用
-      //this.kMinWidthYY *= 0.9;
-      //this.kMinWidthT *= 0.85;
-      
+      /*
+      this.kMinWidthY *= 0.92;
+      this.kMinWidthYY *= 0.92;
+      this.kMinWidthT *= 0.87;
+      */
       //medium用
-      
-      //this.kMinWidthU *= 1.3;
-      //this.kMinWidthYY *= 1.1;
-      //this.kMinWidthT *= 1.16;
+      /*
+      this.kMinWidthU *= 1.3;
+      this.kMinWidthYY *= 1.1;
+      this.kMinWidthT *= 1.16;
+      */
       /*
       //bold用（曲線に課題あり）
       this.kMinWidthU *= 1.6;
@@ -985,8 +989,8 @@ export class Mincho {
     for (let other of others) {
       if ((other[0] == 1 || other[0] == 3 || other[0] == 7) && other[3] == other[5] &&
         !(stroke[4] + 1 > other[6] || stroke[6] - 1 < other[4]) &&
-        Math.abs(stroke[3] - other[3]) < this.kMinWidthT * this.kAdjustTateStep) {
-        res_arr.push(this.kAdjustTateStep - Math.floor(Math.abs(stroke[3] - other[3]) / this.kMinWidthT));
+        Math.abs(stroke[3] - other[3]) < this.kMinWidthT_adjust * this.kAdjustTateStep) {
+        res_arr.push(this.kAdjustTateStep - Math.floor(Math.abs(stroke[3] - other[3]) / this.kMinWidthT_adjust));
       }
     }
     const kAdjustTateStep_org = 4;//original implementation
@@ -1087,12 +1091,12 @@ export class Mincho {
       if (
         (other[0] == 1 && other[4] == other[6] &&
           !(stroke[5] + 1 > other[5] || stroke[7] - 1 < other[3]) &&
-          Math.abs(stroke[6] - other[4]) < this.kMinWidthT * this.kAdjustMageStep) ||
+          Math.abs(stroke[6] - other[4]) < this.kMinWidthT_adjust * this.kAdjustMageStep) ||
         (other[0] == 3 && other[6] == other[8] &&
           !(stroke[5] + 1 > other[7] || stroke[7] - 1 < other[5]) &&
-          Math.abs(stroke[6] - other[6]) < this.kMinWidthT * this.kAdjustMageStep)
+          Math.abs(stroke[6] - other[6]) < this.kMinWidthT_adjust * this.kAdjustMageStep)
       ) {
-        var p = this.kAdjustMageStep - Math.floor(Math.abs(stroke[6] - other[6]) / this.kMinWidthT);
+        var p = this.kAdjustMageStep - Math.floor(Math.abs(stroke[6] - other[6]) / this.kMinWidthT_adjust);
         if ((other[0] == 1 && stroke[6] < other[4]) || (other[0] == 3 && stroke[6] < other[6])) //lines "above" the hane
         {
           res0_above.push(p);
