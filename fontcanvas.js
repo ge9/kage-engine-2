@@ -486,13 +486,20 @@ export class FontCanvas {
     let [bez1, bez2] = Bezier.qBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step);
     var poly = Bezier.bez_to_poly(bez1);
     if (fix_end) {
-      var fix_point = get_extended_dest(x2, y2, sx, sy, 0.1);
-      poly.push(fix_point[0],fix_point[1])
+      var p = new PointMaker(x2, y2, get_dir(x2-sx, y2-sy), 1);
+      poly.push2(p.vec(0.1, -width_func(1)))//fix_union
+      poly.push2(p.vec(0.1, width_func(1)))//fix_union
+      
+      //poly.push2(p.vec(0.01, -0.99))//fix_union
+      //poly.push2(p.vec(0.01, 0.99))//fix_union
     }
     poly.concat(Bezier.bez_to_poly(bez2));
     if (fix_begin) {
-      var fix_point = get_extended_dest(x1, y1, sx, sy, 0.1);
-      poly.push(fix_point[0],fix_point[1])
+      var p = new PointMaker(x1, y1, get_dir(x1-sx, x2-sy), 1);
+      poly.push2(p.vec(0.1, -width_func(0)))//fix_union
+      poly.push2(p.vec(0.1, width_func(0)))//fix_union
+      //poly.push2(p.vec(0.01, -0.99))//fix_union
+      //poly.push2(p.vec(0.01, 0.99))//fix_union
     }
     this.polygons.push(poly);
   }

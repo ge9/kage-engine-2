@@ -402,34 +402,37 @@ export class Mincho {
 
 
 
-      case STROKETYPE.BENDING: {
-        //first line
-        const param_tate = this.adjustTateParam(s, others);
-        const param_mage = this.adjustMageParam(s, others);
+      case STROKETYPE.BENDING:
+      case STROKETYPE.BENDING_ROUND:  {
+        const param_tate = a1 == STROKETYPE.BENDING ? this.adjustTateParam(s, others) : 0;
+        const param_mage = a1 == STROKETYPE.BENDING ? this.adjustMageParam(s, others) : 0;
         const kMinWidthT_m = this.kMinWidthT - param_tate / 2;
         const kMinWidthT_mage = this.kMinWidthT - param_mage / 2;
-        let [tx1, ty1] = moved_point(x2, y2, dir12, -this.kMage);
-        let [tx2, ty2] = moved_point(x2, y2, dir23, this.kMage);
-        {
-          let poly_start = this.getStartOfVLine(x1, y1, x2, y2, a2, kMinWidthT_m, cv);
-          let poly_end = this.getEndOfLine(x1, y1, tx1, ty1, kMinWidthT_m);
-          poly_start.concat(poly_end);
-          cv.addPolygon(poly_start);
+
+        var rate;
+        if (a1 == STROKETYPE.BENDING){
+          rate=1
+        }else{//BENDING_ROUND
+          rate = 6;
+          if ((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2) < 14400) { // smaller than 120 x 120
+            rate = Math.sqrt((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2)) / 120 * 6;
+          }
         }
-        //curve
+
+        let [tx1, ty1] = moved_point(x2, y2, dir12, -this.kMage * rate);
+        let [tx2, ty2] = moved_point(x2, y2, dir23, this.kMage * rate);
+        //first line
+        let poly_start = this.getStartOfVLine(x1, y1, x2, y2, a2, kMinWidthT_m, cv);
         const width_func = function (t) {
-          return kMinWidthT_mage * t + kMinWidthT_m * (1 - t);
-        }
-        cv.drawQBezier(tx1, ty1, x2, y2, tx2, ty2, width_func, t => 0, undefined, true, true);
-
-
-
-        //last line
-        if (tx2 < x3) {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, kMinWidthT_mage, 0, 0, 0, 0*-kMinWidthT_mage);
-        } else {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, kMinWidthT_mage, 0, 0, 0*-kMinWidthT_mage, 0);
-        }
+          return (kMinWidthT_mage - kMinWidthT_m) * t + kMinWidthT_m;
+        }        
+        let [bez1, bez2] = Bezier.qBezier(tx1, ty1, x2, y2, tx2, ty2, width_func, t => 0, undefined);
+        poly_start.concat(Bezier.bez_to_poly(bez1));
+        let edd = this.getEndOfLine(tx2, ty2, x3, y3, kMinWidthT_mage);
+        poly_start.concat(edd);
+        poly_start.concat(Bezier.bez_to_poly(bez2));
+        cv.addPolygon(poly_start);
+      
         if (y2 == y3) {
           if (tx2 < x3) {
             cv.drawCircle_bend_pos(x3, y3, DIR_POSX, kMinWidthT_mage);
@@ -460,63 +463,13 @@ export class Mincho {
         }
         break;
       }
+
+
       case 12: {
         throw "error: unknown stroketype 12";
         break;
       }
-      case STROKETYPE.BENDING_ROUND: {
-        var rate = 6;
-        if ((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2) < 14400) { // smaller than 120 x 120
-          rate = Math.sqrt((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2)) / 120 * 6;
-        }
-        let [tx1, ty1] = moved_point(x2, y2, dir12, -this.kMage * rate);
-        let [tx2, ty2] = moved_point(x2, y2, dir23,  this.kMage * rate);
-        //first line
-        let poly_start = this.getStartOfVLine(x1, y1, x2, y2, a2, this.kMinWidthT, cv);
-        let poly_end = this.getEndOfLine(x1, y1, tx1, ty1, this.kMinWidthT);
-        poly_start.concat(poly_end);
-        cv.addPolygon(poly_start);
-        //curve
-        const width_func = (t) => { return this.kMinWidthT; }
-        cv.drawQBezier(tx1, ty1, x2, y2, tx2, ty2, width_func, t => 0);
 
-
-        //last line
-        if (tx2 < x3) {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, this.kMinWidthT, 0, 0, 0, 0*-this.kMinWidthT);
-        } else {
-          cv.drawOffsetLine(tx2, ty2, x3, y3, this.kMinWidthT, 0, 0, 0*-this.kMinWidthT, 0);
-        }
-        if (y2 == y3) {
-          if (tx2 < x3) {
-            cv.drawCircle_bend_pos(x3, y3, DIR_POSX, this.kMinWidthT);
-          } else {
-            cv.drawCircle_bend_neg(x3, y3, DIR_NEGX, this.kMinWidthT);
-          }
-          if (a3 == ENDTYPE.TURN_UPWARDS) {
-            if (tx2 < x3) {
-              cv.drawTurnUpwards_pos(x3, y3, this.kMinWidthT, this.kWidth * 5, DIR_POSX);
-            } else {
-              cv.drawTurnUpwards_neg(x3, y3, this.kMinWidthT, this.kWidth * 5, DIR_NEGX);
-            }
-          }
-        } else {
-          const dir = get_dir(x3-x2, y3-y2);
-          if (tx2 < x3) {
-            cv.drawCircle_bend_pos(x3, y3, dir, this.kMinWidthT);
-          } else {
-            cv.drawCircle_bend_neg(x3, y3, dir, this.kMinWidthT);
-          }
-          if (a3 == ENDTYPE.TURN_UPWARDS) {
-            if (tx2 < x3) {
-              cv.drawTurnUpwards_pos(x3, y3, this.kMinWidthT, this.kWidth*5, dir);
-            } else {
-              cv.drawTurnUpwards_neg(x3, y3, this.kMinWidthT, this.kWidth*5, dir);
-            }
-          }
-        }
-        break;
-      }
 
 
 
@@ -940,7 +893,7 @@ export class Mincho {
     poly.set(1, x1 + dir.sin * halfWidth,
       y1 - dir.cos * halfWidth);
     poly.set(0, x1 - dir.sin * halfWidth,
-      y1 + dir.sin * halfWidth);
+      y1 + dir.cos * halfWidth);
     return poly;
   }
 
