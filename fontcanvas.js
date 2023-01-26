@@ -495,7 +495,7 @@ export class FontCanvas {
     }
     poly.concat(Bezier.bez_to_poly(bez2));
     if (fix_begin) {
-      var p = new PointMaker(x1, y1, get_dir(x1-sx, x2-sy), 1);
+      var p = new PointMaker(x1, y1, get_dir(x1-sx, y1-sy), 1);
       poly.push2(p.vec(0.1, -width_func(0)))//fix_union
       poly.push2(p.vec(0.1, width_func(0)))//fix_union
       //poly.push2(p.vec(0.01, -0.99))//fix_union
