@@ -89,13 +89,13 @@ export class Mincho {
     } else {
       this.kMinWidthY = 2;
       this.kMinWidthYY = 2;//横線の太さのみを決める。kMinWidthY以上の値が望ましい
-      //this.kMinWidthYY *= 1.2;
+      this.kMinWidthYY *= 1.2;
       this.kMinWidthU = 2;
       this.kMinWidthT = 6;
       this.kMinWidthT_adjust = 6;//use consistent parameter for adjustment
       //this.kMinWidthT = 5.7;
       this.kMinWidthC = 1;//開放・左下右下カドの傾きを決める。1なら元と同じ
-      //this.kMinWidthC *= 0.8;
+      this.kMinWidthC *= 0.8;
       this.kWidth = 5;
       this.kKakato = 3;
       this.kL2RDfatten = 1.1;
@@ -106,18 +106,18 @@ export class Mincho {
       this.kMinWidthY *= 0.92;
       this.kMinWidthYY *= 0.92;
       this.kMinWidthT *= 0.87;
-      */
+      */      
       //medium用
       /*
-      this.kMinWidthU *= 1.3;
+      this.kMinWidthU *= 1.2;
       this.kMinWidthYY *= 1.1;
-      this.kMinWidthT *= 1.16;
+      this.kMinWidthT *= 1.15;
       */
       /*
-      //bold用（曲線に課題あり）
-      this.kMinWidthU *= 1.6;
-      this.kMinWidthYY *= 1.2;
-      this.kMinWidthT *= 1.33;
+      //semi bold用（曲線に課題あり）
+      this.kMinWidthU *= 1.44;
+      this.kMinWidthYY *= 1.21;
+      this.kMinWidthT *= 1.34;
       */
 
       this.kAdjustKakatoL = ([12, 9.6, 7.3, 5, 3, 2]); // for KAKATO adjustment
@@ -245,7 +245,7 @@ export class Mincho {
               const width_func = (t) => { return kMinWidthT_m; }
               const new_x2 = x2 - this.kMage * (((this.kAdjustTateStep + 4) - param_tate) / (this.kAdjustTateStep + 4));
               cv.drawQBezier(tx1, ty1, x2, y2,
-                new_x2, y2, width_func, t => 0);
+                new_x2, y2, width_func, t => 0, undefined, true, false);
               const param_hane = this.adjustHaneParam(s, x2, y2, others);
               cv.drawTurnLeft(new_x2, y2, kMinWidthT_m, this.kWidth * 4 * Math.min(1 - param_hane / 10, Math.pow(kMinWidthT_m / this.kMinWidthT, 3)));
               poly_end = this.getEndOfLine(x1, y1, tx1, ty1, kMinWidthT_m);
@@ -371,7 +371,7 @@ export class Mincho {
             let [tx1, ty1] = moved_point(x3, y3, dir23, -this.kMage*0.439);
             const param_hane = this.adjustHaneParam(s, x3, y3, others);
             const width_func = (t) => { return kMinWidthT_mod; }
-            cv.drawQBezier(tx1, ty1, x3, y3, x3 - this.kMage, y3, width_func, t => 0);
+            cv.drawQBezier(tx1, ty1, x3, y3, x3 - this.kMage, y3, width_func, t => 0, undefined, true, false);
             cv.drawTurnLeft(x3 - this.kMage, y3, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, Math.pow(kMinWidthT_mod / this.kMinWidthT, 3)));
             break;
           }
@@ -420,7 +420,7 @@ export class Mincho {
         const width_func = function (t) {
           return kMinWidthT_mage * t + kMinWidthT_m * (1 - t);
         }
-        cv.drawQBezier(tx1, ty1, x2, y2, tx2, ty2, width_func, t => 0);
+        cv.drawQBezier(tx1, ty1, x2, y2, tx2, ty2, width_func, t => 0, undefined, true, true);
 
 
 
@@ -545,7 +545,7 @@ export class Mincho {
           case ENDTYPE.TURN_LEFT:
             let [tx1, ty1] = moved_point(x4, y4, dir34, -this.kMage*0.439);
             const width_func = (t) => { return kMinWidthT_mod; }
-            cv.drawQBezier(tx1, ty1, x4, y4, x4 - this.kMage, y4, width_func, t => 0);
+            cv.drawQBezier(tx1, ty1, x4, y4, x4 - this.kMage, y4, width_func, t => 0, undefined, true, false);
             const param_hane = this.adjustHaneParam(s, x4, y4, others);
             cv.drawTurnLeft(x4 - this.kMage, y4, kMinWidthT_mod, this.kWidth * 4 * Math.min(1 - param_hane / 10, Math.pow(kMinWidthT_mod / this.kMinWidthT, 3)));
             break;

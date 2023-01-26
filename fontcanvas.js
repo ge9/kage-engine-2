@@ -2,7 +2,7 @@ import { Polygons } from "./polygons.js";
 import { Polygon } from "./polygon.js";
 import { PointMaker } from "./pointmaker.js";
 import { Bezier} from "./bezier.js";
-import {vector_to_len, bez_cir, get_dir, DIR_POSY, rad_to_dir} from "./util.js";
+import {vector_to_len, bez_cir, get_dir, DIR_POSY, rad_to_dir, get_extended_dest} from "./util.js";
 export class FontCanvas {
   constructor() {
     this.polygons = new Polygons();
@@ -124,8 +124,11 @@ export class FontCanvas {
     var p = new PointMaker(x1, y1, dir, kMinWidthT);
     var poly = new Polygon();
     poly.push2(p.vec(0, 1));
+    poly.push2(p.vec(0.01,0));//fix_union
+  
     poly.push2(p.vec(0, -1));
     poly.push2(p.vec(-1, 1));
+
     poly.reverse();
     this.polygons.push(poly);
   }
@@ -321,6 +324,7 @@ export class FontCanvas {
     poly.push2(p.vec(0.94,+bez_cir*1.09), 2);
     poly.push(x2 + vec2[0], y2 + vec2[1], 2);
     poly.push(x2, y2);
+    poly.push2(p.vec(-0.01,0));//fix_union
     this.polygons.push(poly);
   }
 
@@ -335,6 +339,7 @@ export class FontCanvas {
     poly.push2(p.vec(1, bez_cir), 2);
     poly.push2(p.vec(bez_cir, 1), 2);
     poly.push2(p.vec(0, 1));
+    poly.push2(p.vec(-0.01,0));//fix_union
     this.polygons.push(poly);
   }
 
@@ -345,6 +350,7 @@ export class FontCanvas {
     poly.push2(p.vec(1.5, -1), 2);
     poly.push2(p.vec(0.9,  1), 2);
     poly.push2(p.vec(0,  1));
+    poly.push2(p.vec(-0.01,0));//fix_union
     this.polygons.push(poly);
   }
 
@@ -355,6 +361,7 @@ export class FontCanvas {
     poly.push2(p.vec(1.5, 1), 2);
     poly.push2(p.vec(0.9,  -1), 2);
     poly.push2(p.vec(0,  -1));
+    poly.push2(p.vec(-0.01,0));//fix_union
     poly.reverse();
     this.polygons.push(poly);
   }
@@ -370,8 +377,11 @@ export class FontCanvas {
     var p = new PointMaker(x2, y2, dir);
     var poly = new Polygon();
     poly.push2(p.vec(0, kMinWidthT * kagekL2RDfatten));
+    poly.push2(p.vec(-0.1,0));//fix_union
+  
     poly.push2(p.vec(0, -kMinWidthT * kagekL2RDfatten));
     poly.push2(p.vec(kMinWidthT * kagekL2RDfatten * Math.abs(type), kMinWidthT * kagekL2RDfatten * pm));
+    
     this.polygons.push(poly);
   }
 
@@ -415,6 +425,7 @@ export class FontCanvas {
     poly.push(x2 - kMinWidthT*0.3, y2 - kMinWidthT * 0.3,2);
     poly.push(x2, y2 + kMinWidthT * 0.3, 2);
     poly.push(x2, y2 + kMinWidthT);
+    poly.push(x2+0.1, y2);//fix_union
     poly.reverse();
     this.polygons.push(poly);
   }
@@ -471,10 +482,18 @@ export class FontCanvas {
     poly.concat(Bezier.bez_to_poly(bez2));
     this.polygons.push(poly);
   }
-  drawQBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step) {
+  drawQBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step, fix_begin, fix_end) {
     let [bez1, bez2] = Bezier.qBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step);
     var poly = Bezier.bez_to_poly(bez1);
+    if (fix_end) {
+      var fix_point = get_extended_dest(x2, y2, sx, sy, 0.1);
+      poly.push(fix_point[0],fix_point[1])
+    }
     poly.concat(Bezier.bez_to_poly(bez2));
+    if (fix_begin) {
+      var fix_point = get_extended_dest(x1, y1, sx, sy, 0.1);
+      poly.push(fix_point[0],fix_point[1])
+    }
     this.polygons.push(poly);
   }
   drawQBezier2(x1, y1, sx, sy, x2, y2, width_func, width_func_d, curve_step) {
