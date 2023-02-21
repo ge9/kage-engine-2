@@ -106,7 +106,7 @@ export class Mincho {
       this.kMinWidthY *= 0.92;
       this.kMinWidthYY *= 0.92;
       this.kMinWidthT *= 0.87;
-      */      
+      */
       //medium用
       /*
       this.kMinWidthU *= 1.2;
@@ -347,6 +347,7 @@ export class Mincho {
         }
 
         const kMinWidthT_mod = this.kMinWidthT - ~~((s[1] % 10000) / 1000) / 2
+        const end_width_factor = (~~(s[2] / 1000) / 2) / this.kMinWidthT
         //head
         if (a2 == STARTTYPE.OPEN) {
           let [x1ext, y1ext] = moved_point(x1, y1, dir12, 1 * this.kMinWidthY * 0.5);
@@ -364,7 +365,7 @@ export class Mincho {
         }
         //body
         const a2temp = (a2 == STARTTYPE.CONNECTING_V && this.adjustKirikuchiParam(s, others)) ? 100 + a2 : a2;
-        this.minchoDrawCurve(x1, y1, x2, y2, x3, y3, a2temp, a3, cv, kMinWidthT_mod);
+        this.minchoDrawCurve(x1, y1, x2, y2, x3, y3, a2temp, a3, cv, kMinWidthT_mod, end_width_factor);
         //tail
         switch (a3) {
           case ENDTYPE.TURN_LEFT: {
@@ -554,7 +555,7 @@ export class Mincho {
     }
   }
 
-  minchoDrawCurve(x1pre, y1pre, sx, sy, x2pre, y2pre, a1, a2, cv, kMinWidthT_mod) {
+  minchoDrawCurve(x1pre, y1pre, sx, sy, x2pre, y2pre, a1, a2, cv, kMinWidthT_mod, end_width_factor) {
     var delta;
     switch (a1) {
       case STARTTYPE.OPEN:
@@ -587,10 +588,10 @@ export class Mincho {
 
     var cornerOffset = 0;
     if((a1 == STARTTYPE.UPPER_RIGHT_CORNER || a1 == STARTTYPE.ROOFED_THIN) && a2 == ENDTYPE.LEFT_SWEEP){
+      var sx1 = sx; var sx2 = sx; var sy1 = sy; var sy2 = sy;//元の実装と名前を揃える
       function hypot() {
         return Math.sqrt(arguments[0] * arguments[0] + arguments[1] * arguments[1]);
       }
-      var sx1 = sx; var sx2 = sx; var sy1 = sy; var sy2 = sy;
       var contourLength = hypot(sx1-x1, sy1-y1) + hypot(sx2-sx1, sy2-sy1) + hypot(x2-sx2, y2-sy2);
       if (contourLength < 100){
         cornerOffset = (kMinWidthT_mod > 6) ? (kMinWidthT_mod - 6) * ((100 - contourLength) / 100) : 0;
@@ -630,8 +631,9 @@ export class Mincho {
         width_func_d = t => -widfun_d(1 - t, x1, y1, x2, y2, kMinWidthT_mod);
       }
       else {
-        width_func = t => kMinWidthT_mod;
-        width_func_d = t => 0;
+        if (a2 == ENDTYPE.TURN_LEFT) end_width_factor = 0;
+        width_func = t => kMinWidthT_mod * (1 - t*end_width_factor);
+        width_func_d = t => -kMinWidthT_mod*end_width_factor;
       }
       [bez1, bez2] = Bezier.qBezier(x1, y1, sx, sy, x2, y2, width_func, width_func_d);
     }
@@ -684,9 +686,9 @@ export class Mincho {
       const cent_y = (y1 + 4*sy + y2) / 6;
       var rad_end = get_dir(x2-cent_x, y2-cent_y);
        cv.drawTailCircle_tan(x2, y2, rad_end, kMinWidthT_mod*1.1*thin_stop_param, tan1, tan2);
-      }else{//CONNECT_THIN
+      }else{//CONNECT_THIN or others
         const enddir = get_dir(x2-sx, y2-sy);
-        cv.drawTailCircle(x2, y2, enddir, kMinWidthT_mod);
+        cv.drawTailCircle(x2, y2, enddir, kMinWidthT_mod* (1-end_width_factor));
       }
     }
     if (a1 == STARTTYPE.CONNECT_THIN){
