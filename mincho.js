@@ -100,13 +100,26 @@ export class Mincho {
       this.kKakato = 3;
       this.kL2RDfatten = 1.1;
       this.kMage = 10;
-
+      //hair line (デバッグ用)
+      /*
+      this.kMinWidthY *= 0.3;
+      this.kMinWidthYY *= 0.3;
+      this.kMinWidthT *= 0.2;
+      */
+      //extralight用
+      
+      this.kMinWidthU *= 0.71;
+      this.kMinWidthY *= 0.89;
+      this.kMinWidthYY *= 0.85;
+      this.kMinWidthT *= 0.76;
+      
       //light用
       /*
-      this.kMinWidthY *= 0.92;
+      this.kMinWidthU *= 0.85;
+      this.kMinWidthY *= 0.94;
       this.kMinWidthYY *= 0.92;
       this.kMinWidthT *= 0.87;
-      */
+      */      
       //medium用
       /*
       this.kMinWidthU *= 1.2;
