@@ -100,39 +100,31 @@ export class Mincho {
       this.kKakato = 3;
       this.kL2RDfatten = 1.1;
       this.kMage = 10;
-      //hair line (デバッグ用)
-      /*
-      this.kMinWidthY *= 0.3;
-      this.kMinWidthYY *= 0.3;
-      this.kMinWidthT *= 0.2;
-      */
-      //extralight用
+      //size = "HAIR_LINE"
+      if (size == "HAIR_LINE"){//デバッグ用
+        this.kMinWidthY *= 0.3;
+        this.kMinWidthYY *= 0.3;
+        this.kMinWidthT *= 0.2;
+      } else if (size == "EXTRA_LIGHT"){
+        this.kMinWidthU *= 0.71;
+        this.kMinWidthY *= 0.89;
+        this.kMinWidthYY *= 0.85;
+        this.kMinWidthT *= 0.76;
+      } else if (size == "LIGHT"){
+        this.kMinWidthU *= 0.85;
+        this.kMinWidthY *= 0.94;
+        this.kMinWidthYY *= 0.92;
+        this.kMinWidthT *= 0.87;
+      } else if (size == "MEDIUM"){
+        this.kMinWidthU *= 1.2;
+        this.kMinWidthYY *= 1.1;
+        this.kMinWidthT *= 1.15;
+      } else if (size == "DEMIBOLD"){//曲線に課題あり
+        this.kMinWidthU *= 1.44;
+        this.kMinWidthYY *= 1.21;
+        this.kMinWidthT *= 1.34;
+      }
       
-      this.kMinWidthU *= 0.71;
-      this.kMinWidthY *= 0.89;
-      this.kMinWidthYY *= 0.85;
-      this.kMinWidthT *= 0.76;
-      
-      //light用
-      /*
-      this.kMinWidthU *= 0.85;
-      this.kMinWidthY *= 0.94;
-      this.kMinWidthYY *= 0.92;
-      this.kMinWidthT *= 0.87;
-      */      
-      //medium用
-      /*
-      this.kMinWidthU *= 1.2;
-      this.kMinWidthYY *= 1.1;
-      this.kMinWidthT *= 1.15;
-      */
-      /*
-      //semi bold用（曲線に課題あり）
-      this.kMinWidthU *= 1.44;
-      this.kMinWidthYY *= 1.21;
-      this.kMinWidthT *= 1.34;
-      */
-
       this.kAdjustKakatoL = ([12, 9.6, 7.3, 5, 3, 2]); // for KAKATO adjustment
       this.kAdjustKakatoR = ([10,  8, 6, 4, 2, 1]); // for KAKATO adjustment
       this.kAdjustKakatoRangeX = 20; // check area width
