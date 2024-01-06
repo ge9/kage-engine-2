@@ -139,7 +139,33 @@ export class Kage {
 
   //for compatibility
   getEachStrokes(glyphData) {
-    return this.getStrokes(glyphData);
+    const ss = this.getStrokes(glyphData);
+    ss.map(s=>{
+      s.a1_opt = Math.floor(s[0] / 100);
+      s.a1_100 = s[0]%100;
+  
+      s.a2_opt = Math.floor(s[1] / 100);
+      s.a2_100 = s[1]%100;
+      s.a2_opt_1 = s.a2_opt % 10;
+      s.a2_opt_2 = Math.floor(s.a2_opt / 10) % 10;
+      s.a2_opt_3 = Math.floor(s.a2_opt / 100);
+  
+      s.a3_opt = Math.floor(s[2] / 100);
+      s.a3_100 = s[2]%100;
+      s.a3_opt_1 = s.a3_opt % 10;
+      s.a3_opt_2 = Math.floor(s.a3_opt / 10);
+  
+      s.x1=s[3];
+      s.y1=s[4];
+      s.x2=s[5];
+      s.y2=s[6];
+      s.x3=s[7];
+      s.y3=s[8];
+      s.x4=s[9];
+      s.y4=s[10];
+    })
+    
+    return ss;
   }
   getBox(strokes){
     return getBoundingBox(strokes);
